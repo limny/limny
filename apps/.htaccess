@@ -1,0 +1,6 @@
+Allow from all
+
+<Files ~ "\.(ini|php|tpl)$">
+	Order allow,deny
+	Deny from all
+</Files>

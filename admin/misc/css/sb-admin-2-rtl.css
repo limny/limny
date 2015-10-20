@@ -1,0 +1,27 @@
+@media(min-width:768px) {
+    #page-wrapper {
+        margin: 0 250px 0 0;
+    }
+}
+
+ul.nav.navbar-top-links {
+    float: left;
+}
+
+.navbar-top-links .dropdown-user {
+    left: 0;
+    right: auto;
+}
+
+.navbar-top-links li:last-child {
+    margin-left: 15px;
+}
+
+.sidebar .arrow {
+	float: left;
+}
+
+.sidebar .nav-second-level li a {
+	padding-left: 0;
+	padding-right: 37px;
+}

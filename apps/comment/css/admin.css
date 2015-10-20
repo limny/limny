@@ -1,0 +1,84 @@
+/**
+ * unapproved comments
+ */
+
+.comment.unapproved {
+	padding: 2px;
+	margin-bottom: 20px;
+}
+
+.comment.unapproved .header {
+	margin: 5px 10px 0 10px;
+}
+
+.comment.unapproved:hover .email, .comment.unapproved:hover .website, .comment.unapproved:hover .parent, .comment.unapproved:hover .manage {
+	visibility: visible;
+}
+
+.comment.unapproved .header a {
+	color: #555;
+	padding: 2px;
+}
+
+.comment.unapproved .header a:hover {
+	color: #777;
+}
+
+.comment.unapproved .name {
+	cursor: default;
+	font-weight: bold;
+}
+
+.comment.unapproved .email, .comment.unapproved .website, .comment.unapproved .parent {
+	margin-left: 10px;
+	visibility: hidden;
+}
+
+.comment.unapproved .website {
+	margin-left: 10px;
+}
+
+.comment.unapproved .post-title, .comment.unapproved div.text {
+	margin: 5px 10px 5px 10px;
+}
+
+.comment.unapproved ul.manage {
+	margin: 2px 2px 0 0;
+	padding: 0;
+	float: right;
+	visibility: hidden;
+}
+
+.comment.unapproved ul.manage li {
+	padding: 3px;
+	margin-bottom: 2px;
+	text-align: center;
+	list-style-type: none;
+	display: inline;
+	cursor: pointer;
+}
+
+.comment.unapproved ul.manage li:hover {
+	background: #fff;
+	border-radius: 100%;
+}
+
+.comment.unapproved .reply-text, .comment.unapproved .edit-text {
+	width: 98%;
+	margin: 10px 10px 5px 10px;
+}
+
+.comment.unapproved .reply-submit, .comment.unapproved .reply-cancel, .comment.unapproved .edit-save, .comment.unapproved .edit-cancel {
+	margin: 5px 0 10px 10px;
+}
+
+.hidden {
+	display: none;
+	visibility: hidden;
+}
+
+@media all and (max-width: 768px) {
+    .comment.unapproved .email, .comment.unapproved .website, .comment.unapproved .parent, .comment.unapproved ul.manage {
+		visibility: visible;
+	}
+}

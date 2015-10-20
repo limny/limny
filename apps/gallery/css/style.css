@@ -1,0 +1,42 @@
+ul.gallery {
+	margin: 0;
+	padding: 0;
+	display: block;
+}
+
+ul.gallery > li {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+ul.gallery.categories > li > a {
+	margin: 0;
+	padding: 10px;
+	width: 30%;
+	float: left;
+	border-bottom: 1px solid transparent;
+}
+
+ul.gallery.categories > li > a:hover {
+	border-bottom: 1px solid #ccc;
+}
+
+ul.gallery.pictures > li {
+	text-align: center;
+}
+
+ul.gallery.pictures > li > a {
+	padding: 10px;
+	width: 30%;
+	float: left;
+	border-bottom: 1px solid transparent;
+}
+
+ul.gallery.pictures > li > a:hover {
+	border-bottom: 1px solid #ccc;
+}
+
+img.gallery-picture {
+	width: 100%;
+}

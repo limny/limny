@@ -1,0 +1,86 @@
+.message.message-half {
+	float: right;
+}
+
+div.theme .theme-screenshot {
+	float: right;
+}
+
+div.theme .row {
+	margin-left: 0;
+	margin-right: 320px;
+}
+
+div.theme .manage ul.files {
+	margin: 0 10px 0 0;
+}
+
+div.edit-theme ul.files {
+	margin: 0 10px 0 0;
+	float: right;
+}
+
+div.edit-theme ul.files li.selected {
+	border-left-width: 0;
+	border-right: 2px solid #357ebd;
+}
+
+div.edit-theme textarea#text {
+	float: left;
+	direction: ltr;
+	margin-right: 0;
+	margin-left: 10px;
+}
+
+div.edit-theme .action-bar {
+	float: left;
+	margin: 20px 0 0 10px;
+}
+
+div.edit-theme .action-bar button {
+	float: left;
+}
+
+div.edit-theme .action-bar .status {
+	float: right;
+	padding-right: 20px;
+	background-position: right;
+}
+
+.widget-install .install-new {
+	float: right;
+}
+
+ul.permissions > li {
+	padding-right: 10px;
+}
+
+ul.permissions > li.child {
+	padding-right: 30px;
+}
+
+#schema {
+	float: right;
+	width: 70%;
+}
+
+ul#available-widgets {
+	float: left;
+}
+
+.option-toggle, .visibility-toggle {
+	float: left;
+	margin:-5px 0 -5px 5px;
+}
+
+.option-toggle:hover, .visibility-toggle:hover {
+	float: left;
+}
+
+.visibility ul li.item a {
+	float: left;
+}
+
+.manage-buttons {
+	text-align: left;
+}

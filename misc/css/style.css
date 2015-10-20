@@ -1,0 +1,30 @@
+.limny.user-signin-block {
+	margin: 10px 0;
+}
+
+.text-red {
+	color: #dd0000;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.section-half {
+	width: 50%;
+}
+
+.message {
+	padding: 10px 15px;
+	border-radius: 10px;
+	margin-bottom: 10px;
+}
+
+.limny.user-signin-block ul {
+	margin: 0 0 0 10px;
+	padding: 0;
+}
+
+.limny.user-signin-block ul > li {
+	list-style-type: none;
+}

@@ -1,0 +1,55 @@
+.btn-manage {
+	margin-left: 10px;
+}
+
+.form-checkbox, .form-radio {
+	margin-left: 10px;
+}
+
+#manage_search {
+	float: left;
+}
+
+#manage_search input {
+	display: inline;
+	width: auto;
+	box-shadow: none;
+	height: 32px;
+	float: left;
+}
+
+#manage_search input.active {
+	border-left: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+#manage_search button {
+	height: 32px;
+	float: left;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.manage-pagination {
+	color: #777;
+	margin-top: 50px;
+}
+
+.manage-pagination ul {
+	margin-bottom: 0;
+}
+
+.table.manage thead th a {
+	color: #333;
+}
+
+.img-manage {
+	border: 1px solid #ccc;
+	padding: 2px;
+	width: 150px;
+}
+
+.manage-buttons {
+	text-align: left;
+}

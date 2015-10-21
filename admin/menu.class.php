@@ -7,7 +7,7 @@ class Menu extends Manage {
 	public $manage_table = 'menu';
 
 	public $manage_head = [
-		USERNAME => 'name',
+		NAME => 'name',
 		STATUS => 'enabled',
 		ORDER => 'sort'
 	];

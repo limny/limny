@@ -38,7 +38,7 @@ require_once PATH . DS . 'incs' . DS . 'functions.php';
 // set Limny error handler as default error handling function
 set_error_handler('log_error', E_ALL);
 
-// load config object
+// load config library
 $config = load_lib('config');
 
 // set default timezone from configuration

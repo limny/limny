@@ -1,6 +1,20 @@
 <?php
 
+/**
+ * fetch widgets from database and check is visble whether or not
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Widget extends CoreModel {
+	/**
+	 * fetch widgest by position
+	 * positions are defined in theme schema.tpl
+	 * @param  string $position block position
+	 * @return array
+	 */
 	public function widgets($position) {
 		$result = $this->db->prepare('SELECT id, app, method, options, lifetime, roles, languages FROM ' . DB_PRFX . 'widgets WHERE position = ? ORDER BY sort');
 		$result->execute([$position]);
@@ -20,6 +34,11 @@ class Widget extends CoreModel {
 		return isset($widgets) ? $widgets : false;
 	}
 
+	/**
+	 * check widget is visible in language or for role
+	 * @param  array  $widget  widget row from widgets table
+	 * @return boolean
+	 */
 	protected function is_visible($widget) {
 		$roles = ['0'];
 		$language = language();

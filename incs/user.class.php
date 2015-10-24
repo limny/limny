@@ -19,24 +19,13 @@ class User extends Form {
 	 * update user last activity time if is signed in
 	 */
 	public function __construct() {
-		if ($this->signed_in()) {
+		if (user_signed_in()) {
 			global $db;
 
 			$db->prepare('UPDATE ' . DB_PRFX . 'users SET last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SESSION['limny']['user']['id']]);
 		}
 
 		return true;
-	}
-
-	/**
-	 * check user is signed in or not
-	 * @return boolean
-	 */
-	public function signed_in() {
-		if (isset($_SESSION['limny']['user']))
-			return true;
-
-		return false;
 	}
 
 	/**
@@ -52,7 +41,7 @@ class User extends Form {
 
 		$data = '<div class="limny user-signin-block">';
 
-		if ($this->signed_in()) {
+		if (user_signed_in()) {
 			$data .= '<ul>';
 			$data .= '<li><a href="' . url('user/profile') . '">' . PROFILE . '</a></li>';
 			$data .= '<li><a href="' . url('user/signout') . '">' . SIGN_OUT . '</a></li>';
@@ -99,7 +88,7 @@ class User extends Form {
 		if (isset($q['param'][2]))
 			return false;
 
-		if ($this->signed_in())
+		if (user_signed_in())
 			redirect(BASE);
 
 		if (isset($_POST['signin']) && isset($_POST['limny_user']) && isset($_POST['limny_pass']))
@@ -203,7 +192,7 @@ class User extends Form {
 	 * @return [type] [description]
 	 */
 	public function page_signout() {
-		if ($this->signed_in())
+		if (user_signed_in())
 			unset($_SESSION['limny']['user']);
 
 		redirect(BASE);
@@ -214,7 +203,7 @@ class User extends Form {
 	 * @return boolean
 	 */
 	public function page_profile() {
-		if ($this->signed_in() === false)
+		if (user_signed_in() === false)
 			redirect(BASE);
 
 		global $db;
@@ -318,7 +307,7 @@ class User extends Form {
 	 * @return boolean
 	 */
 	public function page_signup() {
-		$signed_in = $this->signed_in();
+		$signed_in = user_signed_in();
 		
 		global $q, $config;
 
@@ -585,7 +574,7 @@ class User extends Form {
 	 * @return boolean
 	 */
 	public function page_forgotpassword() {
-		if ($this->signed_in())
+		if (user_signed_in())
 			redirect(BASE);
 	
 		global $q;

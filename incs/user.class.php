@@ -1,9 +1,23 @@
 <?php
 
+/**
+ * User sign-up, sing-in and forgot password pages and actions
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class User extends Form {
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	/**
+	 * update user last activity time if is signed in
+	 */
 	public function __construct() {
 		if ($this->signed_in()) {
 			global $db;
@@ -14,6 +28,10 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * check user is signed in or not
+	 * @return boolean
+	 */
 	public function signed_in() {
 		if (isset($_SESSION['limny']['user']))
 			return true;
@@ -21,6 +39,11 @@ class User extends Form {
 		return false;
 	}
 
+	/**
+	 * show user block
+	 * contains user login form or user panel
+	 * @return array block_title, block_content
+	 */
 	public function user_block() {
 		global $q, $config;
 
@@ -66,6 +89,10 @@ class User extends Form {
 		return ['title' => SIGN_IN, 'content' => $data];
 	}
 
+	/**
+	 * sign-in page
+	 * @return boolean title and content will be set in properties
+	 */
 	public function page_signin() {
 		global $q, $config;
 
@@ -118,12 +145,23 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * user panel page
+	 * @return boolean
+	 */
 	public function page_default() {
 		redirect(BASE . '/');
 
 		return true;
 	}
 
+	/**
+	 * sign-in entry user
+	 * @param  string  $username
+	 * @param  string  $password
+	 * @param  boolean $remember remember for a 30 days
+	 * @return boolean/array     boolean for successful sign-in and array for error message
+	 */
 	private function signin($username, $password, $remember = false) {
 		if (empty($username) || empty($password))
 			return ['warning', SENTENCE_4];
@@ -160,6 +198,10 @@ class User extends Form {
 		return ['danger', SENTENCE_5];
 	}
 
+	/**
+	 * unset session for sign-out
+	 * @return [type] [description]
+	 */
 	public function page_signout() {
 		if ($this->signed_in())
 			unset($_SESSION['limny']['user']);
@@ -167,6 +209,10 @@ class User extends Form {
 		redirect(BASE);
 	}
 
+	/**
+	 * user profile page and update information
+	 * @return boolean
+	 */
 	public function page_profile() {
 		if ($this->signed_in() === false)
 			redirect(BASE);
@@ -227,6 +273,11 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * update user profile
+	 * @param  array $post form post data from profile page
+	 * @return array       success or error message plus message box class name
+	 */
 	private function profile_update($post) {
 		global $db;
 
@@ -262,6 +313,10 @@ class User extends Form {
 		return ['danger', SENTENCE_9];
 	}
 
+	/**
+	 * user sign-up page
+	 * @return boolean
+	 */
 	public function page_signup() {
 		$signed_in = $this->signed_in();
 		
@@ -362,6 +417,12 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * check user information and add
+	 * @param  array $post                  form post data
+	 * @param  string $signup_request_email email for two step signing-up (confirming email is the first step)
+	 * @return boolean/array                boolean for successful sign-up and array for error message
+	 */
 	private function signup($post, $signup_request_email = null) {
 		$username = @$post['username'];
 		$email = empty($signup_request_email) ? @$post['email'] : $signup_request_email;
@@ -437,6 +498,11 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * check entry email and confirm if it is correct 
+	 * @param  string $email
+	 * @return boolean/array
+	 */
 	private function email_confirmation($email) {
 		if (empty($email))
 			return ['warning', SENTENCE_11];
@@ -504,12 +570,20 @@ class User extends Form {
 		return $data;
 	}
 
+	/**
+	 * delete expired generated codes for two step sign-up and forgot password
+	 * @return boolean
+	 */
 	private function delete_expired_codes() {
 		global $db;
 
 		return $db->query('DELETE FROM ' . DB_PRFX . 'codes WHERE time < UNIX_TIMESTAMP() - 86400')->execute();
 	}
 
+	/**
+	 * forgot password page
+	 * @return boolean
+	 */
 	public function page_forgotpassword() {
 		if ($this->signed_in())
 			redirect(BASE);
@@ -602,6 +676,11 @@ class User extends Form {
 		return true;
 	}
 
+	/**
+	 * send reset password link to email
+	 * @param  string $email
+	 * @return boolean/array
+	 */
 	private function reset_password($email) {
 		if (empty($email))
 			return ['warning', SENTENCE_11];
@@ -656,6 +735,12 @@ class User extends Form {
 			return ['danger', SENTENCE_30];
 	}
 
+	/**
+	 * update user account password
+	 * @param  string $email
+	 * @param  array  $post  form post data
+	 * @return boolean/array
+	 */
 	private function update_password($email, $post) {
 		$new_password = @$post['new_password'];
 		$repeat_new_password = @$post['repeat_new_password'];

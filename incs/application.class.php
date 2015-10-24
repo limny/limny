@@ -1,14 +1,28 @@
 <?php
 
+/**
+ * Applications list and checking methods
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Application {
 	public $db;
 
+	// define database connection as a property
 	public function __construct() {
 		global $db;
 
 		$this->db = $db;
 	}
 
+	/**
+	 * check application is installed or not
+	 * @param  string $name application name
+	 * @return boolean
+	 */
 	public function app_installed($name) {
 		$result = $this->db->prepare('SELECT id FROM ' . DB_PRFX . 'apps WHERE name = ?');
 		$result->execute([$name]);
@@ -16,6 +30,11 @@ class Application {
 		return $result->rowCount() > 0 ? true : false;
 	}
 	
+	/**
+	 * check application is enabled or not
+	 * @param  string $name application name
+	 * @return boolean
+	 */
 	public function app_enabled($name) {
 		$result = $this->db->prepare('SELECT enabled FROM ' . DB_PRFX . 'apps WHERE name = ?');
 		$result->execute([$name]);
@@ -27,6 +46,11 @@ class Application {
 		return false;
 	}
 	
+	/**
+	 * list of installed applications
+	 * @param  integer $enabled 0 for disabled and 1 for enabled applications
+	 * @return array
+	 */
 	public function apps($enabled = null) {
 		if ($enabled === 0 || $enabled === 1)
 			$clause = 'WHERE enabled = ?';
@@ -42,6 +66,11 @@ class Application {
 		return $apps;
 	}
 
+	/**
+	 * load application language
+	 * @param  string $app_name application name
+	 * @return boolean
+	 */
 	public function load_language($app_name) {
 		global $config;
 

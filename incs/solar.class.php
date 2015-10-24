@@ -1,10 +1,30 @@
 <?php
 
+/**
+ * Solar Hijri calendar conversion
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Solar {
+	// unix epoch in solar hijri calendar
 	private $unix_epoch = [1348, 10, 11];
+
+	// number of days in solar hijri calendar months
 	private $s_months = [1 => 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+
+	// mod number of leap years
 	private $leap_mods = [1, 5, 9, 13, 17, 22, 26, 30];
 	
+	/**
+	 * convert gregorian date to solar hijri
+	 * @param  integer  $g_year  gregorian year
+	 * @param  integer  $g_month gregorian month
+	 * @param  integer  $d_day   gregorian day
+	 * @return array             solar_year, solar_month, solar_day
+	 */
 	public function gregorian_to_solar($g_year, $g_month = 1, $d_day = 1) {
 		$timestamp = mktime(0, 0, 0, $g_month, $d_day, $g_year);
 		
@@ -28,7 +48,7 @@ class Solar {
 		
 		$this->s_months[12] = in_array($year, $leap_years) ? 30 : 29;
 		
-		for($i = 0; $i <= $modulus; $i++) {
+		for ($i = 0; $i <= $modulus; $i++) {
 			$day += 1;
 			
 			if ($day == ($this->s_months[$month] + 1)) {
@@ -52,7 +72,14 @@ class Solar {
 		return [$year, $month, $day];
 	}
 	
-	function solar_to_gregorian($s_year, $s_month = 1, $s_day = 1) {
+	/**
+	 * convert solar hijri date to gregorian
+	 * @param  integer  $s_year  solar hijri year
+	 * @param  integer  $s_month solar hijri month
+	 * @param  integer  $s_day   solar hijri day
+	 * @return array             gregorian_year, gregorian_month, gregorian_day
+	 */
+	public function solar_to_gregorian($s_year, $s_month = 1, $s_day = 1) {
 		$years = $s_year - $this->unix_epoch[0] - 1;
 		$timestamp = $years * 31536000 ;
 		

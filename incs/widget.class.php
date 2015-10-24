@@ -17,7 +17,7 @@ class Widget extends CoreModel {
 				$widgets[] = $widget;
 		}
 		
-		return isset($widgets) ? $widgets : false	;
+		return isset($widgets) ? $widgets : false;
 	}
 
 	protected function is_visible($widget) {

@@ -288,7 +288,7 @@ CREATE TABLE `lmn_widgets` (
 
 INSERT INTO `lmn_widgets` (`id`, `app`, `method`, `options`, `position`, `lifetime`, `roles`, `languages`, `sort`) VALUES
 (1, 'limny', 'user_widget', NULL, 'sidebar', NULL, 'all', 'all', 1),
-(2, 'limny', 'content_block', NULL, 'main', NULL, 'all', 'all', 1);
+(2, 'limny', 'content_widget', NULL, 'main', NULL, 'all', 'all', 1);
 
 ALTER TABLE `lmn_adminnav`
   ADD PRIMARY KEY (`id`);

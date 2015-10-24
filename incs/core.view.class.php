@@ -58,7 +58,7 @@ class CoreView {
 				if (isset($widget_item['cache']) === false || $widget_item['cache'] !== true) {
 
 					if ($widget_item['app'] === 'limny') {
-						if ($widget_item['method'] == 'content_block')
+						if ($widget_item['method'] == 'content_widget')
 							echo $this->{$widget_item['method']}();
 						else {
 							list($object_name, $widget_method) = explode('_', $widget_item['method']);
@@ -152,7 +152,7 @@ class CoreView {
 			die("Limny error: Theme files for <em>{$this->theme}</em> not found.");
 	}
 
-	public function content_block() {
+	public function content_widget() {
 		return $this->content;
 	}
 }

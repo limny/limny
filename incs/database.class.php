@@ -1,6 +1,15 @@
 <?php
 
+/**
+ * Limny custom database class
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Database extends PDO {
+	// maximum number of logs in error log file
 	public $max_logs = 100;
 	
 	/**
@@ -21,6 +30,11 @@ class Database extends PDO {
 		}
 	}
 
+	/**
+	 * run database query
+	 * @param  string $statement
+	 * @return object/boolean
+	 */
 	public function query($statement) {
 		if ($result = parent::query($statement))
 			return $result;
@@ -31,6 +45,12 @@ class Database extends PDO {
 		return false;
 	}
 
+	/**
+	 * prepare database query statement
+	 * @param  string $statement
+	 * @param  array  $options
+	 * @return object/bolean
+	 */
 	public function prepare($statement, $options = array()) {
 		if ($result = parent::prepare($statement, $options))
 			return $result;
@@ -41,6 +61,13 @@ class Database extends PDO {
 		return false;
 	}
 
+	/**
+	 * log database errors to error log file
+	 * @param  string  $message
+	 * @param  integer $code
+	 * @param  string  $statement
+	 * @return boolean
+	 */
 	private function log_error($message, $code, $statement) {
 		if (defined('ERROR_LOG') === true && ERROR_LOG === false)
 			return false;

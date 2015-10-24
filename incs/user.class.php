@@ -29,11 +29,11 @@ class User extends Form {
 	}
 
 	/**
-	 * show user block
+	 * show user widget
 	 * contains user login form or user panel
-	 * @return array block_title, block_content
+	 * @return array widget_title, widget_content
 	 */
-	public function user_block() {
+	public function user_widget() {
 		global $q, $config;
 
 		if (isset($q['param'][1]) && $q['param'][0] == 'user' && $q['param'][1] == 'signin')

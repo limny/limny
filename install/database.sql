@@ -287,7 +287,7 @@ CREATE TABLE `lmn_widgets` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `lmn_widgets` (`id`, `app`, `method`, `options`, `position`, `lifetime`, `roles`, `languages`, `sort`) VALUES
-(1, 'limny', 'user_block', NULL, 'sidebar', NULL, 'all', 'all', 1),
+(1, 'limny', 'user_widget', NULL, 'sidebar', NULL, 'all', 'all', 1),
 (2, 'limny', 'content_block', NULL, 'main', NULL, 'all', 'all', 1);
 
 ALTER TABLE `lmn_adminnav`

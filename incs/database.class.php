@@ -51,7 +51,7 @@ class Database extends PDO {
 	 * @param  array  $options
 	 * @return object/bolean
 	 */
-	public function prepare($statement, $options = array()) {
+	public function prepare($statement, $options = []) {
 		if ($result = parent::prepare($statement, $options))
 			return $result;
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * fetch widgets from database and check is visble whether or not
+ * fetch widgets from database and check is visible whether or not
  *
  * @package Limny
  * @author Hamid Samak <hamid@limny.org>
@@ -10,7 +10,7 @@
  */
 class Widget extends CoreModel {
 	/**
-	 * fetch widgest by position
+	 * fetch widgets by position
 	 * positions are defined in theme schema.tpl
 	 * @param  string $position block position
 	 * @return array

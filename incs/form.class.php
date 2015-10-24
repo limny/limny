@@ -1,12 +1,30 @@
 <?php
 
+/**
+ * Create form elements by given array
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Form {
+	// fields options
 	public $form_options = [];
+
+	// default and selected values for fields
 	public $form_values = [];
 
+	// form fields output for further uses
 	private $fields = [];
+
+	// this option names can not be given to element
 	private $reserved_options = ['name', 'label', 'type', 'items', 'value', 'class', 'multiple', 'checked'];
 
+	/**
+	 * prepare form fields as array
+	 * @return array array key is the label and array value is element
+	 */
 	public function fields() {
 		if (is_array($this->form_options) === false || count($this->form_options) < 1)
 			return false;
@@ -132,6 +150,15 @@ class Form {
 		return [];
 	}
 
+	/**
+	 * create form based on prepared fields
+	 * @param  string $method  post or get
+	 * @param  string $action  form action URL
+	 * @param  array  $class   form class name(s)
+	 * @param  string $append  data before fields
+	 * @param  string $prepend data after fields
+	 * @return string          HTML form
+	 */
 	public function make($method = 'post', $action = null, $class = [], $append = null, $prepend = null) {
 		if (count($this->fields) < 1)
 			$this->fields();
@@ -164,6 +191,13 @@ class Form {
 		return $data;
 	}
 
+	/**
+	 * create form button
+	 * @param  string $name       element name
+	 * @param  string $value      button label
+	 * @param  array  $attributes element attributes (attribute_name => attribute_value)
+	 * @return string             HTML element
+	 */
 	public function button($name, $value, $attributes = []) {
 		$data = '<button name="' . $name . '"';
 

@@ -11,7 +11,8 @@
 class Menu {
 	/**
 	 * get menu items as an array
-	 * @return array selected item specified with different index name
+	 * selected item specified with different index name
+	 * @return array/boolean boolean as error
 	 */
 	public function items() {
 		global $db;
@@ -31,7 +32,7 @@ class Menu {
 				$items[] = $item;
 		}
 		
-		return $items;
+		return isset($items) ? $items : false;
 	}
 }
 

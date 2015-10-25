@@ -1,6 +1,18 @@
 <?php
 
+/**
+ * prepare menu items
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Menu {
+	/**
+	 * get menu items as an array
+	 * @return array selected item specified with different index name
+	 */
 	public function items() {
 		global $db;
 

@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Limny core functions
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * define constant if not exists
+ * @param  string  $name
+ * @param  string  $value
+ * @param  boolean $case_insensitive
+ * @return boolean
+ */
 function def($name, $value, $case_insensitive = false) {
 	if (defined($name) === false)
 		return define($name, $value, $case_insensitive);
@@ -7,12 +23,20 @@ function def($name, $value, $case_insensitive = false) {
 	return false;
 }
 
+/**
+ * redirect page to entry URL
+ * @param  string $url
+ */
 function redirect($url) {
 	header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
 	header('Location: ' . $url);
 	exit;
 }
 
+/**
+ * is administrator signed in
+ * @return boolean
+ */
 function admin_signed_in() {
 	if (isset($_SESSION['limny']['admin']))
 		return true;
@@ -20,6 +44,11 @@ function admin_signed_in() {
 	return false;
 }
 
+/**
+ * difference between current time and given time
+ * @param  integer $timestamp unix timestamp
+ * @return boolean/array      boolean on error and array on success
+ */
 function time_diff($timestamp) {
 	$current_time = time();
 
@@ -51,6 +80,14 @@ function time_diff($timestamp) {
 	return [floor($diff / $prev_seconds * 10), $unit];
 }
 
+/**
+ * load Limny library
+ * @param  string  $lib_name      library file name
+ * @param  boolean $return_object return result as new instance of object
+ * @param  boolean $admin_lib     if true read from /admin directory otherwise read from /incs
+ * @param  array   $parameters    available parameter for creating new instance
+ * @return object/boolean
+ */
 function load_lib($lib_name, $return_object = true, $admin_lib = false, $parameters = []) {
 	$lib_name = str_replace(['.', '/', '\\'], '', $lib_name);
 	$lib_file = PATH . DS . ($admin_lib === true ? 'admin' : 'incs') . DS . strtolower($lib_name) . '.class.php';
@@ -75,6 +112,13 @@ function load_lib($lib_name, $return_object = true, $admin_lib = false, $paramet
 	die('Limny error: Library file <em>' . $lib_name . '</em> not found.');
 }
 
+/**
+ * find string with first and last given occurrence characters
+ * @param  string $string
+ * @param  string $start_char
+ * @param  string $end_char
+ * @return string
+ */
 function substring($string, $start_char, $end_char) {
 	$start_pos = strpos($string, $start_char);
 	
@@ -89,6 +133,12 @@ function substring($string, $start_char, $end_char) {
 	return $string;
 }
 
+/**
+ * convert given date or timestamp to configured date format
+ * @param  string/integer $date_or_timestamp
+ * @param  string         $format            PHP date format
+ * @return boolean/string                    return boolean on error
+ */
 function system_date($date_or_timestamp, $format = null) {
 	global $db, $config;
 
@@ -124,6 +174,11 @@ function system_date($date_or_timestamp, $format = null) {
 	return $date_in_format;
 }
 
+/**
+ * parse current q parameter from HTTP GET
+ * @param  string $q
+ * @return array     return q parameter as array and current language
+ */
 function query($q = null) {
 	if (empty($q))
 		$q = isset($_GET['q']) ? $_GET['q'] : null;
@@ -153,6 +208,13 @@ function query($q = null) {
 	return ['param' => $q];
 }
 
+/**
+ * create URL based on configuration and arguments
+ * @param  string  $query
+ * @param  boolean $full           if true URL will be with website address
+ * @param  boolean $lang_if_exists use current language other than system configured language
+ * @return string
+ */
 function url($query, $full = false, $lang_if_exists = true) {
 	global $config;
 
@@ -183,6 +245,11 @@ function url($query, $full = false, $lang_if_exists = true) {
 	return $url;
 }
 
+/**
+ * generates random hashes
+ * @param  integer $length hash length
+ * @return string
+ */
 function rand_hash($length = 32) {
 	$alphanumeric = [range('A', 'Z'), range('a', 'z'), range('0', '25')];
 	
@@ -201,6 +268,14 @@ function rand_hash($length = 32) {
 	return $result;
 }
 
+/**
+ * send mail using PHPMailer library and configured SMTP information
+ * @param  string/array $to          receiver(s) (array mode: name => address)
+ * @param  string       $subject     
+ * @param  string       $message
+ * @param  array        $attachments array of attachment files
+ * @return boolean
+ */
 function send_mail($to, $subject, $message, $attachments = []) {
 	global $config;
 
@@ -239,6 +314,13 @@ function send_mail($to, $subject, $message, $attachments = []) {
 	return false;
 }
 
+/**
+ * load custom view from theme path or application path and use given variables
+ * @param  string         $app_name  application name
+ * @param  string         $view_name view file name
+ * @param  array          $vars      variable name => variable value
+ * @return string/boolean            boolean on error
+ */
 function load_view($app_name, $view_name, $vars = []) {
 	if (isset($vars['vars']) || isset($vars['view_file']))
 		die('Limny error: It\'s not possible to use <em>vars</em> and <em>view_file</em> names for variables');
@@ -268,6 +350,11 @@ function load_view($app_name, $view_name, $vars = []) {
 	return false;
 }
 
+/**
+ * show navigation items
+ * @param  array  $items item URL => item title
+ * @return string
+ */
 function nav($items) {
 	foreach ($items as $url => $title) {
 		$link = is_numeric($url) ? false : true;
@@ -278,6 +365,12 @@ function nav($items) {
 	return implode(' &#8250; ', $items);
 }
 
+/**
+ * load custom CSS file from theme path or application path
+ * @param  string         $app_name application name
+ * @param  string         $css_name CSS file name
+ * @return string/boolean           boolean on error
+ */
 function load_css($app_name, $css_name) {
 	global $config;
 
@@ -295,6 +388,14 @@ function load_css($app_name, $css_name) {
 	return false;
 }
 
+/**
+ * log errors to error log file
+ * @param  integer  $no   error number
+ * @param  string   $str  error message
+ * @param  string   $file error file
+ * @param  integer  $line
+ * @return boolean
+ */
 function log_error($no, $str, $file = null, $line = null) {
 	if (defined('ERROR_LOG') === true && ERROR_LOG === false)
 		return false;
@@ -336,6 +437,10 @@ function log_error($no, $str, $file = null, $line = null) {
 	return true;
 }
 
+/**
+ * is user signed in
+ * @return boolean
+ */
 function user_signed_in() {
 	if (isset($_SESSION['limny']['user']))
 		return true;
@@ -343,6 +448,10 @@ function user_signed_in() {
 	return false;
 }
 
+/**
+ * get current language
+ * @return string language name in two characters
+ */
 function language() {
 	global $config;
 

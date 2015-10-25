@@ -1,12 +1,29 @@
 <?php
 
+/**
+ * Limny core controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class CoreController {
+	// view object
 	public $view;
+
+	// current language code (ISO 639-1)
 	public $language;
 
+	// current query parameter
 	private $q;
+
+	// predefined head tags
 	private $head;
 	
+	/**
+	 * set necessary properties
+	 */
 	public function __construct($q) {
 		$this->q = $q;
 		$this->view = new CoreView($this->q);
@@ -14,6 +31,9 @@ class CoreController {
 		$this->head = '<link href="' . BASE . '/misc/css/style.css" rel="stylesheet">' . "\n" . '<script type="text/javascript" src="' . BASE . '/misc/js/script.js"></script>';
 	}
 
+	/**
+	 * launch available startups for enabled applications
+	 */
 	private function __startup() {
 		$apps = $this->view->model->application->apps('1');
 
@@ -25,6 +45,10 @@ class CoreController {
 		}
 	}
 	
+	/**
+	 * include system language file
+	 * @return boolean
+	 */
 	private function set_language() {
 		if (isset($this->q['lang']))
 			$this->language = $this->q['lang'];
@@ -43,6 +67,10 @@ class CoreController {
 		return true;
 	}
 
+	/**
+	 * set default content based configured options
+	 * @return boolean
+	 */
 	private function default_content() {
 		if (empty($this->q['param'][0])) {
 			$default = $this->view->model->config->config->default_content;
@@ -60,6 +88,10 @@ class CoreController {
 		return true;
 	}
 
+	/**
+	 * load user related contents (sign-up, sign-in, forgot password and update profile)
+	 * @return boolean
+	 */
 	private function user_content() {
 		$user = load_lib('user');
 		$user_method = 'page_' . (isset($this->q['param'][1]) ? $this->q['param'][1] : 'default');
@@ -74,6 +106,11 @@ class CoreController {
 		return true;
 	}
 
+	/**
+	 * set error message and HTTP head
+	 * @param  string $title
+	 * @param  string $content
+	 */
 	private function error_message($title, $content) {
 		header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
 		
@@ -81,6 +118,11 @@ class CoreController {
 		$this->view->content = $content;
 	}
 
+	/**
+	 * get cache file and return contents if exists
+	 * @param  string         $cache_file cache file path
+	 * @return string/boolean             boolean on error
+	 */
 	private function read_cache($cache_file) {
 		$pragma = isset($_SERVER['HTTP_PRAGMA']) ? $_SERVER['HTTP_PRAGMA'] : null;
 
@@ -91,6 +133,13 @@ class CoreController {
 		return false;
 	}
 
+	/**
+	 * load application libraries and create content
+	 * @param  string  $app_name
+	 * @param  string  $method_name
+	 * @param  string  $cache_file
+	 * @return boolean              true on page existence and false on page not found
+	 */
 	private function load_app($app_name, $method_name, $cache_file) {
 		$app_path = PATH . DS . 'apps' . DS . $app_name . DS;
 		$app_lang_file = $app_path . DS . 'langs' . DS . $this->language . '.php';
@@ -154,6 +203,12 @@ class CoreController {
 		return isset($is_404) ? fales : true;
 	}
 
+	/**
+	 * put contents to cache file
+	 * @param  string  $cache_file
+	 * @param  integer $life_time
+	 * @return boolean
+	 */
 	private function put_cache($cache_file, $life_time) {
 		file_put_contents($cache_file, serialize([
 			'head' => $this->view->head,
@@ -167,6 +222,9 @@ class CoreController {
 		return true;
 	}
 
+	/**
+	 * initialize the system and show proper content
+	 */
 	public function init() {
 		$this->set_language();
 		$this->__startup();

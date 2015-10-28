@@ -29,31 +29,21 @@ class Admin {
 
 	public $direction = false;
 
-	public function __construct(){
-		global $db;
-
-		$this->db = $db;
+	public function __construct($registry){
+		$this->db = $registry->db;
+		$this->config = $registry->config;
 
 		if (isset($_GET['q']) && empty($_GET['q']) === false)
 			$this->q = array_filter(explode('/', $_GET['q']));
 
 		if (empty($this->q[0]))
 			$this->q[0] = 'dashboard';
-
+		
 		return true;
 	}
 
-	public function signed_in() {
-		if (isset($_SESSION['limny']['admin']))
-			return true;
-
-		return false;
-	}
-
 	public function load_language() {
-		global $config;
-
-		$lang = $config->config->language;
+		$lang = $this->config->language;
 
 		if (strlen($lang) === 2) {
 			$lang_file = PATH . DS . 'langs' . DS . $lang . DS . 'admin.php';
@@ -259,9 +249,7 @@ class Admin {
 	}
 
 	public function app_load_language($app_name) {
-		global $config;
-
-		$lang = $config->config->language;
+		$lang = $this->config->language;
 
 		foreach ([$lang, 'en'] as $lang) {
 			$app_name = str_replace(['.', '/', '\\'], '', $app_name);

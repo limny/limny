@@ -1,12 +1,10 @@
 <?php
 
 class Permalink {
-	public $db;
+	private $db;
 
-	public function __construct() {
-		global $db;
-
-		$this->db = $db;
+	public function __construct($registry) {
+		$this->db = $registry->db;
 	}
 
 	public function permalink_exists($permalink_str, $exclude_id = null) {

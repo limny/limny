@@ -1,10 +1,18 @@
 <?php
 
 class CommentAdminController extends Manage {
+	public $q;
+
 	public $head;
 
-	public function __construct() {
-		parent::__construct();
+	public $config;
+
+	public function __construct($registry) {
+		parent::__construct($registry);
+
+		$this->config = $registry->config;
+		CommentAdminModel::$db = $registry->db;
+		CommentAdminModel::$config = $registry->config;
 
 		$this->manage_q = $this->q;
 
@@ -53,8 +61,6 @@ class CommentAdminController extends Manage {
 	}
 
 	private function send_notification_mail($comment_id, $to_parent = true) {
-		global $config;
-
 		$comment = CommentAdminModel::comment($comment_id);
 
 		if ($to_parent === true && empty($comment['replyto']) === false) {
@@ -66,7 +72,7 @@ class CommentAdminController extends Manage {
 			return false;
 
 		$link = url('post/' . $comment['post'] . '#comment-' . $comment['id'], true);
-		$message = load_view('comment', 'email.tpl', ['config' => $config, 'link' => $link]);
+		$message = load_view('comment', 'email.tpl', ['config' => $this->config, 'link' => $link]);
 				
 		send_mail($email, COMMENT_SENTENCE_7, $message);
 

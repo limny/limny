@@ -3,10 +3,8 @@
 class Setup {
 	private $db;
 
-	public function __construct() {
-		global $db;
-
-		$this->db = $db;
+	public function __construct($registry) {
+		$this->db = $registry->db;
 	}
 
 	public function add_adminnav($items) {

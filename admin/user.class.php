@@ -61,8 +61,8 @@ class User extends Manage {
 		'last_activity' => LAST_ACTIVITY
 	];
 	
-	public function User($parameters = []) {
-		parent::__construct($parameters);
+	public function User($registry, $parameters = []) {
+		parent::__construct($registry, $parameters);
 
 		$this->manage_fields['roles']['items'] = $this->table_to_array('roles', 'id', 'name');
 
@@ -98,8 +98,6 @@ class User extends Manage {
 	}
 
 	public function username_check($username, $data = [], $files = [], $id = null) {
-		global $db;
-
 		if (strlen($username) < 3)
 			return SENTENCE_22;
 
@@ -115,7 +113,7 @@ class User extends Manage {
 		} else
 			$edit_statement = '';
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE username = :username' . $edit_statement);
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE username = :username' . $edit_statement);
 		$result->execute($values);
 
 		if ($result->fetchColumn() > 0)
@@ -149,8 +147,6 @@ class User extends Manage {
 	}
 
 	public function email_check($email, $data = [], $files = [], $id = null) {
-		global $db;
-
 		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false)
 			return SENTENCE_26;
 
@@ -162,7 +158,7 @@ class User extends Manage {
 			$values['id'] = $id;
 		}
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = :email' . @$edit_statement);
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = :email' . @$edit_statement);
 		$result->execute($values);
 
 		if ($result->fetchColumn() > 0)
@@ -175,10 +171,8 @@ class User extends Manage {
 		if (in_array('1', $ids))
 			return false;
 
-		global $db;
-
 		foreach ($ids as $id) {
-			$db->prepare('DELETE FROM ' . DB_PRFX . 'profiles WHERE user = ?')->execute([$id]);
+			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'profiles WHERE user = ?')->execute([$id]);
 		}
 
 		return true;
@@ -195,9 +189,7 @@ class User extends Manage {
 		if (empty($id))
 			return false;
 
-		global $db;
-
-		return $db->prepare('INSERT INTO ' . DB_PRFX . 'profiles (user) VALUES (?)')->execute([$id]);
+		return $this->db->prepare('INSERT INTO ' . DB_PRFX . 'profiles (user) VALUES (?)')->execute([$id]);
 	}
 }
 

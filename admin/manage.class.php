@@ -37,17 +37,15 @@ class Manage extends Admin {
 	// PRIVATE PROPERTIES
 	private $manage_image_exts = ['png', 'gif', 'jpg', 'jpeg'];
 
-	public function __construct($parameters = []) {
-		global $db, $config;
-		
-		parent::__construct($db);
+	public function __construct($registry = [], $parameters = []) {
+		parent::__construct($registry);
 
 		settype($this->manage_action, 'object');
 
 		foreach (['add', 'view', 'edit', 'check', 'list', 'add_value', 'edit_value', 'field'] as $action)
 			$this->manage_action->{$action} = new stdClass;
 
-		$language = $config->config->language;
+		$language = $this->config->language;
 		require_once PATH . DS . 'langs' . DS . $language . DS . 'manage.php';
 
 		if (isset($parameters['q']))
@@ -55,8 +53,6 @@ class Manage extends Admin {
 	}
 
 	public function manage() {
-		global $admin;
-		
 		if (end($this->manage_q) === 'add' || end($this->manage_q) === 'delete' || end($this->manage_q) === 'search')
 			$this->manage_base = array_slice($this->manage_q, 0, -1);
 		else if (isset($this->manage_q[count($this->manage_q) - 2]) && in_array($this->manage_q[count($this->manage_q) - 2], ['view', 'edit', 'delete']))
@@ -95,6 +91,8 @@ class Manage extends Admin {
 				$ids = [$id];
 			else if (isset($post['items']))
 				$ids = $post['items'];
+			else
+				$ids = [];
 
 			$data = $this->delete($ids, $post);
 		} else if (isset($second_level) && $second_level === 'sort') {
@@ -115,15 +113,13 @@ class Manage extends Admin {
 			$data = $this->list_table();
 		}
 		
-		$data .= '<link rel="stylesheet" type="text/css" href="' . BASE . '/' . ADMIN_DIR . '/misc/css/manage' . ($admin->direction ? '-' . $admin->direction : null) . '.css" />';
+		$data .= '<link rel="stylesheet" type="text/css" href="' . BASE . '/' . ADMIN_DIR . '/misc/css/manage' . ($this->direction ? '-' . $this->direction : null) . '.css" />';
 		$data .= '<script type="text/javascript" src="' . BASE . '/' . ADMIN_DIR . '/misc/js/manage.js"></script>';
 
 		return $data;
 	}
 
 	public function list_table() {
-		global $db;
-
 		$data = '';
 		
 		$message_success = [
@@ -233,7 +229,7 @@ class Manage extends Admin {
 
 		$limit = ' LIMIT ' . (($page - 1) * $this->manage_number) . ',' . $this->manage_number;
 		
-		$result = $db->prepare('SELECT COUNT(*) AS count FROM ' . DB_PRFX . $this->manage_table . $where_clause);
+		$result = $this->db->prepare('SELECT COUNT(*) AS count FROM ' . DB_PRFX . $this->manage_table . $where_clause);
 		$result->execute(isset($search_values) ? $search_values : []);
 		
 		$count = $result->fetchColumn();
@@ -277,7 +273,7 @@ class Manage extends Admin {
 			</div>';
 		}
 		
-		$result = $db->prepare($this->manage_query . (isset($where_clause) ? $where_clause : null) . (isset($orders) ? $orders : null) . $limit);
+		$result = $this->db->prepare($this->manage_query . (isset($where_clause) ? $where_clause : null) . (isset($orders) ? $orders : null) . $limit);
 		$result->execute(isset($search_values) ? $search_values : []);
 		
 		if ($result->rowCount() > 0) {
@@ -330,8 +326,6 @@ class Manage extends Admin {
 	}
 
 	public function input_form($post = [], $files = [], $id = null) {
-		global $db;
-
 		if (isset($post) && count($post) > 0) {
 			foreach ($this->manage_fields as $column => $options)
 				if (isset($post[$column]) || isset($files[$column])) {
@@ -450,11 +444,9 @@ class Manage extends Admin {
 	}
 
 	protected function table_to_array($table, $id_column, $title_column) {
-		global $db;
-
 		$table = str_replace(['\'', '"'], '', $table);
 
-		$result = $db->query('SELECT * FROM ' . DB_PRFX . $table);
+		$result = $this->db->query('SELECT * FROM ' . DB_PRFX . $table);
 		$result->execute();
 
 		while ($item = $result->fetch(PDO::FETCH_ASSOC))
@@ -464,8 +456,6 @@ class Manage extends Admin {
 	}
 
 	private function add($post = [], $files = []) {
-		global $db;
-
 		if (isset($this->manage_action->add_value))
 			foreach ((array) $this->manage_action->add_value as $column => $value) {
 				$this->manage_fields[$column] = [];
@@ -491,10 +481,10 @@ class Manage extends Admin {
 		
 		if (isset($values)) {
 			$table = str_replace(['\'', '"'], '', $this->manage_table);
-			$db->prepare('INSERT INTO ' . DB_PRFX . $this->manage_table . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', array_keys($values)) . ')')->execute($values);
+			$this->db->prepare('INSERT INTO ' . DB_PRFX . $this->manage_table . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', array_keys($values)) . ')')->execute($values);
 
 			if (isset($this->manage_action->add->function))
-				$this->call_action('add', 'function', $post, $files, $db->lastInsertId());
+				$this->call_action('add', 'function', $post, $files, $this->db->lastInsertId());
 
 			if (isset($_POST['add_more'])) {
 				redirect($_SERVER['REQUEST_URI']);
@@ -509,8 +499,6 @@ class Manage extends Admin {
 	}
 
 	private function edit($post, $files, $id) {
-		global $db;
-
 		if (isset($this->manage_action->edit_value))
 			foreach ((array) $this->manage_action->edit_value as $column => $value) {
 				$this->manage_fields[$column] = [];
@@ -556,7 +544,7 @@ class Manage extends Admin {
 			$table = str_replace(['\'', '"'], '', $this->manage_table);
 			$id_column = str_replace(['\'', '"'], '', $this->manage_id_col);
 
-			$db->prepare('UPDATE ' . DB_PRFX . $table . ' SET ' . implode(', ', $columns) . ' WHERE ' . $id_column . ' = ?')->execute($values);
+			$this->db->prepare('UPDATE ' . DB_PRFX . $table . ' SET ' . implode(', ', $columns) . ' WHERE ' . $id_column . ' = ?')->execute($values);
 
 			if (isset($this->manage_action->edit->function))
 				$this->call_action('edit', 'function', $post, $files, $id, $before_update);
@@ -574,8 +562,6 @@ class Manage extends Admin {
 			redirect($this->manage_base);
 
 		if (isset($post['delete'])) {
-			global $db;
-
 			if (isset($this->manage_action->delete))
 				if (empty($this->manage_action->delete) === false && method_exists($this, $this->manage_action->delete) && is_callable([$this, $this->manage_action->delete])) {
 					$delete = $this->{$this->manage_action->delete}($ids);
@@ -600,7 +586,7 @@ class Manage extends Admin {
 						if (file_exists($this->manage_upload_path . DS . $item[$file_column]))
 							unlink($this->manage_upload_path . DS . $item[$file_column]);
 
-				$db->prepare('DELETE FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?')->execute([$id]);
+				$this->db->prepare('DELETE FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?')->execute([$id]);
 			}
 			
 			$_SESSION['_manage_delete_success'] = true;
@@ -669,8 +655,6 @@ class Manage extends Admin {
 			redirect($this->manage_base);
 		}
 
-		global $db;
-
 		foreach ($this->manage_search as $column) {
 			$column = str_replace(['\'', '"'], '', $column);
 
@@ -707,8 +691,6 @@ class Manage extends Admin {
 	}
 
 	public function view($id = null) {
-		global $db;
-
 		if (count($this->manage_fields) > 0) {
 			$data = $this->nav([
 				$this->manage_title => ['icon' => $this->manage_icon, 'url' => $this->manage_base],
@@ -719,7 +701,7 @@ class Manage extends Admin {
 				$table = str_replace(['\'', '"'], '', $this->manage_table);
 				$id_column = str_replace(['\'', '"'], '', $this->manage_id_col);
 
-				$result = $db->prepare('SELECT * FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?');
+				$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?');
 				$result->execute([$id]);
 
 				if ($item = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -817,15 +799,13 @@ class Manage extends Admin {
 	}
 
 	protected function get_item($id, $column = null, $table = null) {
-		global $db;
-
 		if (empty($table))
 			$table = $this->manage_table;
 
 		$table = str_replace(['\'', '"'], '', $table);
 		$id_column = str_replace(['\'', '"'], '', $this->manage_id_col);
 
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?');
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?');
 		$result->execute([$id]);
 
 		if ($item = $result->fetch(PDO::FETCH_ASSOC))

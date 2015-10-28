@@ -49,8 +49,8 @@ class Menu extends Manage {
 		],
 	];
 	
-	public function Menu($parameters = []) {
-		parent::__construct($parameters);
+	public function Menu($registry, $parameters = []) {
+		parent::__construct($registry, $parameters);
 
 		$this->manage_action->list->name = 'menu_name';
 		$this->manage_action->list->sort = 'menu_sort';
@@ -58,9 +58,7 @@ class Menu extends Manage {
 	}
 
 	private function menu_items() {
-		global $db;
-
-		$result = $db->query('SELECT id, sort FROM ' . DB_PRFX . 'menu ORDER BY sort ASC');
+		$result = $this->db->query('SELECT id, sort FROM ' . DB_PRFX . 'menu ORDER BY sort ASC');
 		while ($menu = $result->fetch(PDO::FETCH_ASSOC))
 			$items[$menu['id']] = $menu;
 
@@ -100,8 +98,6 @@ class Menu extends Manage {
 	}
 
 	public function menu_sort_set($id, $place) {
-		global $db;
-
 		if (in_array($place, ['up', 'down']) === false)
 			return false;
 
@@ -116,9 +112,9 @@ class Menu extends Manage {
 		else if ($place == 'down')
 			$new_order = (string) $items[$id] + 1;
 
-		$db->prepare('UPDATE ' . DB_PRFX . 'menu SET sort = ? WHERE sort = ?')->execute([$items[$id], $new_order]);
+		$this->db->prepare('UPDATE ' . DB_PRFX . 'menu SET sort = ? WHERE sort = ?')->execute([$items[$id], $new_order]);
 
-		$db->prepare('UPDATE ' . DB_PRFX . 'menu SET sort = ? WHERE id = ?')->execute([$new_order, $id]);
+		$this->db->prepare('UPDATE ' . DB_PRFX . 'menu SET sort = ? WHERE id = ?')->execute([$new_order, $id]);
 
 		redirect(BASE . '/' . ADMIN_DIR . '/menu');
 

@@ -1,22 +1,20 @@
 <?php
 
 class PostModel {
-	public static function posts($count = 10, $offset = 0) {
-		global $db;
+	public static $db;
 
+	public static function posts($count = 10, $offset = 0) {
 		$count = ceil($count);
 		$offset = ceil($offset);
 
-		$result = $db->query('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
+		$result = self::$db->query('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
 		$result->execute();
 
 		return $result->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public static function post($id) {
-		global $db;
-
-		$result = $db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE ' . DB_PRFX . 'posts.id = ? AND published = 1');
+		$result = self::$db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE ' . DB_PRFX . 'posts.id = ? AND published = 1');
 		$result->execute([$id]);
 
 		if ($post = $result->fetch(PDO::FETCH_ASSOC))
@@ -26,34 +24,28 @@ class PostModel {
 	}
 
 	public static function posts_by_cat($cat_id, $count = 10, $offset = 0) {
-		global $db;
-
 		$count = ceil($count);
 		$offset = ceil($offset);
 
-		$result = $db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND FIND_IN_SET(?, category) > 0 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
+		$result = self::$db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND FIND_IN_SET(?, category) > 0 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
 		$result->execute([$cat_id]);
 
 		return $result->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public static function posts_by_tag($tag, $count = 10, $offset = 0) {
-		global $db;
-
 		$count = ceil($count);
 		$offset = ceil($offset);
 
-		$result = $db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND FIND_IN_SET(?, tags) > 0 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
+		$result = self::$db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND FIND_IN_SET(?, tags) > 0 ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
 		$result->execute([$tag]);
 
 		return $result->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public static function num_posts($cat_id = null, $tag = null, $user_id = null) {
-		global $db;
-
 		if (empty($cat_id) && empty($tag) && empty($user_id)) {
-			$result = $db->query('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1');
+			$result = self::$db->query('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1');
 			$result->execute();
 
 			$count = $result->fetch(PDO::FETCH_ASSOC);
@@ -76,7 +68,7 @@ class PostModel {
 			$tag_statement = ' AND user = ?';
 		}
 		
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1 ' . @$category_statement . @$tag_statement);
+		$result = self::$db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1 ' . @$category_statement . @$tag_statement);
 		$result->execute($values);
 
 		$count = $result->fetch(PDO::FETCH_ASSOC);
@@ -85,21 +77,17 @@ class PostModel {
 	}
 
 	public static function cat_by_id($cat_id) {
-		global $db;
-
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
+		$result = self::$db->prepare('SELECT * FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
 		$result->execute([$cat_id]);
 
 		return $result->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public static function posts_by_author($user_id, $count = 10, $offset = 0) {
-		global $db;
-
 		$count = ceil($count);
 		$offset = ceil($offset);
 
-		$result = $db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND ' . DB_PRFX . 'posts.user = ? ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
+		$result = self::$db->prepare('SELECT ' . DB_PRFX . 'posts.*, ' . DB_PRFX . 'users.username FROM ' . DB_PRFX . 'posts INNER JOIN ' . DB_PRFX . 'users ON ' . DB_PRFX . 'users.id = ' . DB_PRFX . 'posts.user WHERE published = 1 AND ' . DB_PRFX . 'posts.user = ? ORDER BY time DESC LIMIT ' . $offset . ',' . $count);
 		$result->execute([$user_id]);
 
 		return $result->fetchAll(PDO::FETCH_ASSOC);

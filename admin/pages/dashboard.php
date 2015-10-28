@@ -13,6 +13,8 @@ if (isset($apps['comment']) && empty($apps['comment']['enabled']) === false) {
 
 	require_once PATH . DS . 'apps' . DS . 'comment' . DS . 'admin.model.class.php';
 
+	CommentAdminModel::$db = $admin->db;
+
 	if ($unapproved_comments = CommentAdminModel::unapproved())
 		$notifications .= '<li><i class="fa fa-comment"></i> <a href="' . BASE . '/' . ADMIN_DIR . '/comment/unapproved">' . str_replace('{NUMBER}', '<span>' . count($unapproved_comments) . '</span>', COMMENT_SENTENCE_9) . '</a></li>';
 }
@@ -60,6 +62,8 @@ $(function(){
 </form>';
 	
 	require_once PATH . DS . 'apps' . DS . 'post' . DS . 'admin.model.class.php';
+
+	PostAdminModel::$db = $admin->db;
 
 	if ($num_uncategorized_posts = PostAdminModel::num_uncategorized_posts())
 		$notifications .= '<li><i class="fa fa-folder"></i> <a href="' . BASE . '/' . ADMIN_DIR . '/post/posts">' . str_replace('{NUMBER}', '<span>' . count($num_uncategorized_posts) . '</span>', POST_SENTENCE_4) . '</a></li>';

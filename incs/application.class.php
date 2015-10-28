@@ -9,13 +9,20 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Application {
-	public $db;
+	// database connection
+	private $db;
 
-	// define database connection as a property
-	public function __construct() {
-		global $db;
+	// configuration values
+	private $config;
 
-		$this->db = $db;
+	/**
+	 * define database connection as a property
+	 * @param object $registry
+	 * @return void
+	 */
+	public function __construct($registry) {
+		$this->db = $registry->db;
+		$this->config = $registry->config;
 	}
 
 	/**
@@ -72,9 +79,7 @@ class Application {
 	 * @return boolean
 	 */
 	public function load_language($app_name) {
-		global $config;
-
-		$lang = $config->config->language;
+		$lang = $this->config->language;
 
 		foreach ([$lang, 'en'] as $lang) {
 			$app_name = str_replace(['.', '/', '\\'], '', $app_name);

@@ -1,6 +1,12 @@
 <?php
 
-class Page extends Admin {
+class Page {
+	private $db;
+
+	public function Page($registry) {
+		$this->db = $registry->db;
+	}
+
 	public function page_signin() {
 		if (isset($_POST['limny_username']) && isset($_POST['limny_password'])) {
 			$username = $_POST['limny_username'];
@@ -60,7 +66,7 @@ class Page extends Admin {
 	}
 
 	public function page_signout() {
-		if ($this->signed_in()) {
+		if (admin_signed_in() === true) {
 			$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = NULL, hash = NULL WHERE id = ?')->execute([$_SESSION['limny']['admin']['id']]);
 			
 			unset($_SESSION['limny']['admin']);

@@ -15,17 +15,27 @@ class User extends Form {
 	// page content
 	public $content;
 
+	// query parameter
+	private $q;
+
+	// database object
+	private $db;
+
+	// configuration values
+	private $config;
+
 	/**
 	 * update user last activity time if is signed in
+	 * @param object $registry
+	 * @return void
 	 */
-	public function __construct() {
-		if (user_signed_in()) {
-			global $db;
+	public function __construct($registry) {
+		$this->q = $registry->q;
+		$this->db = $registry->db;
+		$this->config = $registry->config;
 
-			$db->prepare('UPDATE ' . DB_PRFX . 'users SET last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SESSION['limny']['user']['id']]);
-		}
-
-		return true;
+		if (user_signed_in())
+			$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SESSION['limny']['user']['id']]);
 	}
 
 	/**
@@ -34,9 +44,7 @@ class User extends Form {
 	 * @return array widget_title, widget_content
 	 */
 	public function user_widget() {
-		global $q, $config;
-
-		if (isset($q['param'][1]) && $q['param'][0] == 'user' && $q['param'][1] == 'signin')
+		if (isset($this->q['param'][1]) && $this->q['param'][0] == 'user' && $this->q['param'][1] == 'signin')
 			return false;
 
 		$data = '<div class="limny user-signin-block">';
@@ -60,7 +68,7 @@ class User extends Form {
 
 		$this->form_values = @$_POST;
 
-		if (empty($config->config->user_registration) === false)
+		if (empty($this->config->user_registration) === false)
 			$user_registration = '<a href="' . BASE . '/user/signup">' . SIGN_UP . '</a><br>';
 		else
 			$user_registration = null;
@@ -83,9 +91,7 @@ class User extends Form {
 	 * @return boolean title and content will be set in properties
 	 */
 	public function page_signin() {
-		global $q, $config;
-
-		if (isset($q['param'][2]))
+		if (isset($this->q['param'][2]))
 			return false;
 
 		if (user_signed_in())
@@ -107,7 +113,7 @@ class User extends Form {
 
 		$this->form_values = @$_POST;
 
-		if (empty($config->config->user_registration) === false)
+		if (empty($this->config->user_registration) === false)
 			$user_registration = '<a href="' . BASE . '/user/signup">' . SIGN_UP . '</a><br>';
 		else
 			$user_registration = null;
@@ -136,12 +142,10 @@ class User extends Form {
 
 	/**
 	 * user panel page
-	 * @return boolean
+	 * @return void
 	 */
 	public function page_default() {
 		redirect(BASE . '/');
-
-		return true;
 	}
 
 	/**
@@ -155,9 +159,7 @@ class User extends Form {
 		if (empty($username) || empty($password))
 			return ['warning', SENTENCE_4];
 
-		global $db;
-
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'users WHERE username = ?');
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'users WHERE username = ?');
 		$result->execute([$username]);
 
 		if ($user = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -173,11 +175,11 @@ class User extends Form {
 				if (empty($remember) === false) {
 					$hash = md5(uniqid(rand(), true));
 
-					$db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = INET_ATON(?), hash = ?, last_login = UNIX_TIMESTAMP(), last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SERVER['REMOTE_ADDR'], $hash, $user['id']]);
+					$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = INET_ATON(?), hash = ?, last_login = UNIX_TIMESTAMP(), last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SERVER['REMOTE_ADDR'], $hash, $user['id']]);
 
 					setcookie('limny_user', $hash, time() + 2592000, '/');
 				} else {
-					$db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = INET_ATON(?), hash = NULL, last_login = UNIX_TIMESTAMP(), last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SERVER['REMOTE_ADDR'], $user['id']]);
+					$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = INET_ATON(?), hash = NULL, last_login = UNIX_TIMESTAMP(), last_activity = UNIX_TIMESTAMP() WHERE id = ?')->execute([$_SERVER['REMOTE_ADDR'], $user['id']]);
 				}
 
 				return true;
@@ -189,7 +191,7 @@ class User extends Form {
 
 	/**
 	 * unset session for sign-out
-	 * @return [type] [description]
+	 * @return void
 	 */
 	public function page_signout() {
 		if (user_signed_in())
@@ -205,8 +207,6 @@ class User extends Form {
 	public function page_profile() {
 		if (user_signed_in() === false)
 			redirect(BASE);
-
-		global $db;
 
 		if (isset($_POST['update']))
 			if ($profile_update = $this->profile_update($_POST))
@@ -230,7 +230,7 @@ class User extends Form {
 			'repeat_new_password' => ['label' => REPEAT_NEW_PASSWORD, 'type' => 'password'],
 		];
 
-		$result = $db->prepare('SELECT nick_name, first_name, last_name FROM ' . DB_PRFX . 'profiles WHERE user = ?');
+		$result = $this->db->prepare('SELECT nick_name, first_name, last_name FROM ' . DB_PRFX . 'profiles WHERE user = ?');
 		$result->execute([$_SESSION['limny']['user']['id']]);
 		$profile = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -268,8 +268,6 @@ class User extends Form {
 	 * @return array       success or error message plus message box class name
 	 */
 	private function profile_update($post) {
-		global $db;
-
 		$nick_name = @$post['nick_name'];
 		$first_name = @$post['first_name'];
 		$last_name = @$post['last_name'];
@@ -286,7 +284,7 @@ class User extends Form {
 				if ($new_password === $repeat_new_password) {
 					$new_password = $password_hash->HashPassword($new_password);
 
-					$db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE id = ?')->execute([$new_password, $_SESSION['limny']['user']['id']]);
+					$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE id = ?')->execute([$new_password, $_SESSION['limny']['user']['id']]);
 
 					$_SESSION['limny']['user']['password'] = $new_password;
 				} else
@@ -294,7 +292,7 @@ class User extends Form {
 			}
 				
 
-			$db->prepare('UPDATE ' . DB_PRFX . 'profiles SET nick_name = ?, first_name = ?, last_name = ? WHERE id = ?')->execute([$nick_name, $first_name, $last_name, $_SESSION['limny']['user']['id']]);
+			$this->db->prepare('UPDATE ' . DB_PRFX . 'profiles SET nick_name = ?, first_name = ?, last_name = ? WHERE id = ?')->execute([$nick_name, $first_name, $last_name, $_SESSION['limny']['user']['id']]);
 
 			return ['success', SENTENCE_7];
 		}
@@ -309,12 +307,10 @@ class User extends Form {
 	public function page_signup() {
 		$signed_in = user_signed_in();
 		
-		global $q, $config;
-
 		$this->title = SIGN_UP;
 		$this->content = '<h1>' . SIGN_UP . '</h1>';
 
-		if (empty($config->config->user_registration)) {
+		if (empty($this->config->user_registration)) {
 			$this->content .= '<div class="message bg-warning">' . SENTENCE_18 . '</div><br>
 			<div class="text-center"><a href="' . BASE . '" class="btn btn-info">' . MAIN_PAGE . '</a></div>';
 
@@ -334,13 +330,11 @@ class User extends Form {
 			if ($signed_in)
 				redirect(BASE);
 
-			global $db;
-
 			$code = $q['param'][2];
 
 			$this->delete_expired_codes();
 
-			$result = $db->prepare('SELECT email FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
+			$result = $this->db->prepare('SELECT email FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
 			$result->execute(['signup', $code]);
 			$signup_request = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -351,7 +345,7 @@ class User extends Form {
 		if ($signed_in)
 			redirect(BASE);
 
-		$email_confirmation = $config->config->email_confirmation;
+		$email_confirmation = $this->config->email_confirmation;
 
 		$required = ' <span class="text-red">*</span>';
 
@@ -433,9 +427,7 @@ class User extends Form {
 		if ($password !== $repeat_password)
 			return ['danger', SENTENCE_17];
 
-		global $db;
-
-		$result = $db->prepare('SELECT username, email FROM ' . DB_PRFX . 'users WHERE username = ? OR email = ?');
+		$result = $this->db->prepare('SELECT username, email FROM ' . DB_PRFX . 'users WHERE username = ? OR email = ?');
 		$result->execute([$username, $email]);
 
 		while ($user = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -448,37 +440,35 @@ class User extends Form {
 		$this->delete_expired_codes();
 
 		if (empty($signup_request_email)) {
-			$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
+			$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
 			$result->execute(['signup', $email]);
 			$count = $result->fetch(PDO::FETCH_ASSOC);
 			if ($count['count'] > 0)
 				return ['warning', SENTENCE_19];
 		} else 
-			$db->prepare('DELETE FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?')->execute(['signup', $email]);
-
-		global $config;
+			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?')->execute(['signup', $email]);
 
 		require_once PATH . DS . 'incs' . DS . 'passwordhash.class.php';
 		$password_hash = new PasswordHash(8, false);
 
 		$password = $password_hash->HashPassword($password);
 
-		$db->prepare('INSERT INTO ' . DB_PRFX . 'users (username, password, email, enabled) VALUES (?, ?, ?, ?)')->execute([$username, $password, $email, '1']);
+		$this->db->prepare('INSERT INTO ' . DB_PRFX . 'users (username, password, email, enabled) VALUES (?, ?, ?, ?)')->execute([$username, $password, $email, '1']);
 
 		$message = SENTENCE_23;
 		$message = str_replace(
 			['{TITLE}', '{USERNAME}'],
-			[$config->config->title, $username],
+			[$this->config->title, $username],
 			$message
 		);
 
 		send_mail($email, SIGN_UP, $this->email($message));
 
-		$user_id = $db->lastInsertId();
+		$user_id = $this->db->lastInsertId();
 
-		$db->prepare('INSERT INTO ' . DB_PRFX . 'profiles (user) VALUES (?)')->execute([$user_id]);
+		$this->db->prepare('INSERT INTO ' . DB_PRFX . 'profiles (user) VALUES (?)')->execute([$user_id]);
 
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'users WHERE id = ?');
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'users WHERE id = ?');
 		$result->execute([$user_id]);
 		$user = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -499,9 +489,7 @@ class User extends Form {
 		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false)
 			return ['danger', SENTENCE_13];
 
-		global $db, $config;
-
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = ?');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = ?');
 		$result->execute([$email]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] > 0)
@@ -509,20 +497,20 @@ class User extends Form {
 
 		$this->delete_expired_codes();
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
 		$result->execute(['signup', $email]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] > 0)
 			return ['warning', SENTENCE_19];
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND ip = INET_ATON(?)');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND ip = INET_ATON(?)');
 		$result->execute(['signup', $_SERVER['REMOTE_ADDR']]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] > 5)
 			return ['danger', SENTENCE_21];
 
 		while ($code = rand_hash(64)) {
-			$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
+			$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
 			$result->execute(['signup', $code]);
 			$count = $result->fetch(PDO::FETCH_ASSOC);
 			if ($count['count'] < 1)
@@ -532,14 +520,14 @@ class User extends Form {
 		$message = SENTENCE_22;
 		$message = str_replace(
 			['{TITLE}', '{LINK}'],
-			[$config->config->title, url('user/signup/' . $code, true)],
+			[$this->config->title, url('user/signup/' . $code, true)],
 			$message
 		);
 
 		$mail = send_mail($email, SIGN_UP, $this->email($message));
 
 		if ($mail === true) {
-			$db->prepare('INSERT INTO ' . DB_PRFX . 'codes (type, email, code, ip, time) VALUES (?, ?, ?, INET_ATON(?), UNIX_TIMESTAMP())')->execute(['signup', $email, $code, $_SERVER['REMOTE_ADDR']]);
+			$this->db->prepare('INSERT INTO ' . DB_PRFX . 'codes (type, email, code, ip, time) VALUES (?, ?, ?, INET_ATON(?), UNIX_TIMESTAMP())')->execute(['signup', $email, $code, $_SERVER['REMOTE_ADDR']]);
 
 			return true;
 		} else
@@ -547,11 +535,9 @@ class User extends Form {
 	}
 
 	public function email($message) {
-		global $config;
-
 		$data = '<html>';
 		$data .= '<body>';
-		$data .= '<h2>' . $config->config->title . '</h2>';
+		$data .= '<h2>' . $this->config->title . '</h2>';
 		$data .= '<div style="padding:10px;">' . $message . '</div>';
 		$data .= '</body>';
 		$data .= '</html>';
@@ -564,9 +550,7 @@ class User extends Form {
 	 * @return boolean
 	 */
 	private function delete_expired_codes() {
-		global $db;
-
-		return $db->query('DELETE FROM ' . DB_PRFX . 'codes WHERE time < UNIX_TIMESTAMP() - 86400')->execute();
+		return $this->db->query('DELETE FROM ' . DB_PRFX . 'codes WHERE time < UNIX_TIMESTAMP() - 86400')->execute();
 	}
 
 	/**
@@ -576,17 +560,15 @@ class User extends Form {
 	public function page_forgotpassword() {
 		if (user_signed_in())
 			redirect(BASE);
-	
-		global $q;
 
 		$this->title = FORGOT_PASSWORD;
 		$this->content = '<h1>' . FORGOT_PASSWORD . '</h1>';
 
-		if (isset($q['param'][2])) {
-			if (in_array($q['param'][2], ['done', 'sent'])) {
-				if ($q['param'][2] == 'sent')
+		if (isset($this->q['param'][2])) {
+			if (in_array($this->q['param'][2], ['done', 'sent'])) {
+				if ($this->q['param'][2] == 'sent')
 					$message = SENTENCE_27;
-				else if ($q['param'][2] == 'done') {
+				else if ($this->q['param'][2] == 'done') {
 					$message = SENTENCE_28;
 					$link = '<br><div class="text-center"><a href="' . url('user/signin') . '" class="btn btn-info">' . SIGN_IN . '</a></div>';
 				}
@@ -599,13 +581,11 @@ class User extends Form {
 				return true;
 			}
 
-			global $db;
-
-			$code = $q['param'][2];
+			$code = $this->q['param'][2];
 
 			$this->delete_expired_codes();
 
-			$result = $db->prepare('SELECT email FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
+			$result = $this->db->prepare('SELECT email FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
 			$result->execute(['forgotpassword', $code]);
 			$resetpassword_request = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -621,7 +601,7 @@ class User extends Form {
 					else
 						$message = $update_password;
 
-			$result = $db->prepare('SELECT username FROM ' . DB_PRFX . 'users WHERE email = ?');
+			$result = $this->db->prepare('SELECT username FROM ' . DB_PRFX . 'users WHERE email = ?');
 			$result->execute([$resetpassword_request['email']]);
 			$user = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -677,9 +657,7 @@ class User extends Form {
 		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false)
 			return ['danger', SENTENCE_13];
 
-		global $db, $config;
-
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = ?');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'users WHERE email = ?');
 		$result->execute([$email]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] < 1)
@@ -687,20 +665,20 @@ class User extends Form {
 
 		$this->delete_expired_codes();
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?');
 		$result->execute(['forgotpassword', $email]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] > 0)
 			return ['warning', SENTENCE_25];
 
-		$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND ip = INET_ATON(?)');
+		$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND ip = INET_ATON(?)');
 		$result->execute(['forgotpassword', $_SERVER['REMOTE_ADDR']]);
 		$count = $result->fetch(PDO::FETCH_ASSOC);
 		if ($count['count'] > 5)
 			return ['danger', SENTENCE_21];
 
 		while ($code = rand_hash(64)) {
-			$result = $db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
+			$result = $this->db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'codes WHERE type = ? AND code = ?');
 			$result->execute(['forgotpassword', $code]);
 			$count = $result->fetch(PDO::FETCH_ASSOC);
 			if ($count['count'] < 1)
@@ -710,14 +688,14 @@ class User extends Form {
 		$message = SENTENCE_26;
 		$message = str_replace(
 			['{TITLE}', '{LINK}'],
-			[$config->config->title, url('user/forgotpassword/' . $code, true)],
+			[$this->config->title, url('user/forgotpassword/' . $code, true)],
 			$message
 		);
 
 		$mail = send_mail($email, RESET_PASSWORD, $this->email($message));
 
 		if ($mail === true) {
-			$db->prepare('INSERT INTO ' . DB_PRFX . 'codes (type, email, code, ip, time) VALUES (?, ?, ?, INET_ATON(?), UNIX_TIMESTAMP())')->execute(['forgotpassword', $email, $code, $_SERVER['REMOTE_ADDR']]);
+			$this->db->prepare('INSERT INTO ' . DB_PRFX . 'codes (type, email, code, ip, time) VALUES (?, ?, ?, INET_ATON(?), UNIX_TIMESTAMP())')->execute(['forgotpassword', $email, $code, $_SERVER['REMOTE_ADDR']]);
 
 			return true;
 		} else
@@ -743,16 +721,14 @@ class User extends Form {
 		if ($new_password !== $repeat_new_password)
 			return ['danger', SENTENCE_17];
 
-		global $db, $config;
-
 		require_once PATH . DS . 'incs' . DS . 'passwordhash.class.php';
 		$password_hash = new PasswordHash(8, false);
 
 		$new_password = $password_hash->HashPassword($new_password);
 
-		$db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE email = ?')->execute([$new_password, $email]);
+		$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE email = ?')->execute([$new_password, $email]);
 
-		$db->prepare('DELETE FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?')->execute(['forgotpassword', $email]);
+		$this->db->prepare('DELETE FROM ' . DB_PRFX . 'codes WHERE type = ? AND email = ?')->execute(['forgotpassword', $email]);
 
 		return true;
 	}

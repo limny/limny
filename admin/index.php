@@ -4,11 +4,14 @@ require_once '..' . DIRECTORY_SEPARATOR . 'init.php';
 
 def('ADMIN_DIR', 'admin');
 
+require_once PATH . DS . 'incs' . DS . 'core.model.class.php';
+$model = new CoreModel($registry);
+
 $admin = load_lib('admin', true, true);
 
 $admin->load_language();
 
-if ($admin->signed_in() !== true) {
+if (admin_signed_in() !== true) {
 	$admin->is_remembered();
 
 	if ($admin->q[0] !== 'signin')
@@ -18,8 +21,9 @@ if ($admin->signed_in() !== true) {
 $permission = load_lib('permission', true, true);
 
 if (in_array($admin->q[0], $admin->pages_in_method)) {
-	require_once PATH . DS . 'admin' . DS . 'page.class.php';
-	$page = new Page;
+	//require_once PATH . DS . 'admin' . DS . 'page.class.php';
+	//$page = new Page($registry);
+	$page = load_lib('page', true, true);
 
 	if (method_exists($page, 'page_' . $admin->q[0]))
 		$page->{'page_' . $admin->q[0]}();

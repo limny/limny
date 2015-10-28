@@ -1,19 +1,21 @@
 <?php
 
 class GalleryApp {
+	private $db;
+
 	private $setup;
 
-	public function __construct() {
+	public function __construct($registry) {
+		$this->db = $registry->db;
+
 		$setup = load_lib('setup', true, true);
 
 		$this->setup = $setup;
 	}
 
 	public function install() {
-		global $db;
-
 		// create gallery table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'gallery (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'gallery (
 	id int(11) NOT NULL,
 	title varchar(256) NOT NULL,
 	image varchar(128) DEFAULT NULL,
@@ -23,23 +25,23 @@ class GalleryApp {
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'gallery ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'gallery ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'gallery MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'gallery MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// create categories table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'gallery_cats (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'gallery_cats (
 	id int(11) NOT NULL,
 	name varchar(256) NOT NULL,
 	parent int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'gallery_cats ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'gallery_cats ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'gallery_cats MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'gallery_cats MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// item(s) for admin panel navigation
 		$this->setup->add_adminnav([
@@ -65,10 +67,8 @@ class GalleryApp {
 	}
 
 	public function uninstall() {
-		global $db;
-
 		// delete uploaded files
-		$result = $db->query('SELECT image FROM ' . DB_PRFX . 'gallery');
+		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'gallery');
 		$result->execute();
 		while ($post = $result->fetch(PDO::FETCH_ASSOC)) {
 			$image_file = PATH . DS . 'uploads' . DS . $post['image'];
@@ -80,10 +80,10 @@ class GalleryApp {
 		}
 
 		// drop gallery table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'gallery');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'gallery');
 
 		// drop categories table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'gallery_cats');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'gallery_cats');
 
 		// remove admin navigation items
 		$this->setup->adminnav_delete('gallery');

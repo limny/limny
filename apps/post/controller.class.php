@@ -8,6 +8,14 @@ class PostController {
 	public $title;
 	public $content;
 
+	private $registry;
+
+	public function PostController($registry) {
+		$this->registry = $registry;
+		
+		PostModel::$db = $registry->db;
+	}
+
 	public function __global() {
 		if (count($this->q['param']) < 2 || (count($this->q['param']) === 3 && $this->q['param'][1] == 'page' && is_numeric($this->q['param'][2])))
 			return $this->__default();
@@ -70,7 +78,7 @@ class PostController {
 				$application->load_language('comment');
 
 				require_once PATH . DS . 'apps' . DS . 'comment' . DS . 'comment.class.php';
-				$comment = new Comment;
+				$comment = new Comment($this->registry);
 
 				$this->head .= $comment->head;
 				$this->content .= $comment->comment($post, (isset($_GET['replyto']) ? $_GET['replyto'] : null));

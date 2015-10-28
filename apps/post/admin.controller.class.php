@@ -7,8 +7,10 @@ class PostAdminController extends Manage {
 	public $title;
 	public $content;
 
-	public function __construct() {
-		parent::__construct();
+	public function __construct($registry) {
+		parent::__construct($registry);
+
+		PostAdminModel::$db = $registry->db;
 
 		$this->manage_q = $this->q;
 	}
@@ -140,13 +142,12 @@ $(function(){
 	}
 
 	protected function post_category($cat_ids) {
-		global $db;
-
 		foreach (explode(',', $cat_ids) as $cat_id) {
-			$result = $db->prepare('SELECT name FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
-			$result->execute([$cat_id]);
+			//$result = $db->prepare('SELECT name FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
+			//$result->execute([$cat_id]);
 
-			if ($category = $result->fetch(PDO::FETCH_ASSOC))
+			//if ($category = $result->fetch(PDO::FETCH_ASSOC))
+			if ($category = PostAdminModel::category($cat_id))
 				$names[] = $category['name'];
 		}
 

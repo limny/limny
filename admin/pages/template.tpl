@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?=$config->config->language?>">
+<html lang="<?=$admin->config->language?>">
 
 <head>
 
@@ -56,7 +56,7 @@
 
 			<ul class="nav navbar-top-links"> <!-- class <navbar-right> removed -->
 
-				<li><a href="<?=$config->config->address;?>" target="_blank"><i class="fa fa-globe fa-fw"></i></a></li>
+				<li><a href="<?=$admin->config->address;?>" target="_blank"><i class="fa fa-globe fa-fw"></i></a></li>
 
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">

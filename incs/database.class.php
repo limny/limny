@@ -19,7 +19,7 @@ class Database extends PDO {
 	 * @param string $user username
 	 * @param string $pass password
 	 */
-	public function __construct($host, $port, $user, $pass) {
+	public function Database($host, $port, $user, $pass) {
 		try {
 			$db = parent::__construct('mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
 			parent::setAttribute(parent::ATTR_EMULATE_PREPARES, false);

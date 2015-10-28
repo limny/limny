@@ -3,7 +3,11 @@
 class Widget extends Form {
 	public $widgets_path;
 
-	public function __construct() {
+	private $db;
+
+	public function __construct($registry) {
+		$this->db = $registry->db;
+
 		$this->widgets_path = PATH . DS . 'widgets';
 	}
 	
@@ -11,9 +15,7 @@ class Widget extends Form {
 		if (empty($widget_id))
 			return false;
 
-		global $db;
-
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'widgets WHERE id = ?');
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'widgets WHERE id = ?');
 		$result->execute([$widget_id]);
 		
 		if ($widget = $result->fetch(PDO::FETCH_ASSOC))
@@ -23,12 +25,10 @@ class Widget extends Form {
 	}
 
 	public function widgets($app = 'all') {
-		global $db;
-
 		$widgets = [];
 		$is_all = $app === 'all' ? true : false;
 
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'widgets ' . ($is_all ? null : 'WHERE app = ?') . ' ORDER BY sort');
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'widgets ' . ($is_all ? null : 'WHERE app = ?') . ' ORDER BY sort');
 		
 		$array = $is_all !== true ? [$app] : [];
 
@@ -43,15 +43,13 @@ class Widget extends Form {
 	}
 
 	public function update_position($widget_id, $position, $sort) {
-		global $db;
-
-		$db->prepare('UPDATE ' . DB_PRFX . 'widgets SET position = ? WHERE id = ?')->execute([$position, $widget_id]);
+		$this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET position = ? WHERE id = ?')->execute([$position, $widget_id]);
 
 		if (is_array($sort) && count($sort) > 0) {
 			$i = 1;
 			
 			foreach ($sort as $widget_id) {
-				$db->prepare('UPDATE ' . DB_PRFX . 'widgets SET sort = ? WHERE id = ?')->execute([$i, $widget_id]);
+				$this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET sort = ? WHERE id = ?')->execute([$i, $widget_id]);
 
 				$i = $i + 1;
 			}
@@ -99,18 +97,16 @@ class Widget extends Form {
 	}
 
 	public function update_options($widget_id, $options) {
-		global $db;
-
 		parse_str($options, $options);
 		$options = serialize($options);
 
-		return $db->prepare('UPDATE ' . DB_PRFX . 'widgets SET options = ? WHERE id = ?')->execute([$options, $widget_id]);
+		return $this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET options = ? WHERE id = ?')->execute([$options, $widget_id]);
 
 		return $result;
 	}
 
 	public function update_visibility($widget_id, $roles = null, $langs = null) {
-		global $db, $admin;
+		global $admin;
 
 		if (empty($roles) === false) {
 			$all_roles = $admin->roles();
@@ -121,7 +117,7 @@ class Widget extends Form {
 
 			$roles = count($roles) == count($all_roles) + 1 ? 'all' : implode(',', array_keys($roles));
 
-			return $db->prepare('UPDATE ' . DB_PRFX . 'widgets SET roles = ? WHERE id = ?')->execute([$roles, $widget_id]);
+			return $this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET roles = ? WHERE id = ?')->execute([$roles, $widget_id]);
 		} else if (empty($langs) === false) {
 			$all_langs = $admin->languages();
 
@@ -131,21 +127,17 @@ class Widget extends Form {
 
 			$langs = count($langs) == count($all_langs) ? 'all' : implode(',', array_keys($langs));
 
-			return $db->prepare('UPDATE ' . DB_PRFX . 'widgets SET languages = ? WHERE id = ?')->execute([$langs, $widget_id]);
+			return $this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET languages = ? WHERE id = ?')->execute([$langs, $widget_id]);
 		}
 
 		return false;
 	}
 
 	public function install_widget($widget_name) {
-		global $db;
-
-		return $db->prepare('INSERT INTO ' . DB_PRFX . 'widgets (app, method, position, roles, languages) VALUES (?, ?, ?, ?, ?)')->execute(['widget', $widget_name, 'none', 'all', 'all']);
+		return $this->db->prepare('INSERT INTO ' . DB_PRFX . 'widgets (app, method, position, roles, languages) VALUES (?, ?, ?, ?, ?)')->execute(['widget', $widget_name, 'none', 'all', 'all']);
 	}
 
 	public function uninstall_widget($widget_id) {
-		global $db;
-
 		if ($widget = $this->widget($widget_id)) {
 
 			$widget_directory = PATH . DS . 'widgets' . DS . $widget['method'];
@@ -160,7 +152,7 @@ class Widget extends Form {
 				rmdir($widget_directory);
 			}
 
-			$db->prepare('DELETE FROM ' . DB_PRFX . 'widgets WHERE id = ?')->execute([$widget_id]);
+			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'widgets WHERE id = ?')->execute([$widget_id]);
 
 			return true;
 		}

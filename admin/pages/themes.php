@@ -13,7 +13,7 @@ switch ($admin->q[1]) {
 	default:
 		$admin->title = THEMES;
 
-		$current_theme = $config->config->theme;
+		$current_theme = $admin->config->theme;
 
 		unset($themes[array_search($current_theme, $themes)]);
 
@@ -153,11 +153,9 @@ switch ($admin->q[1]) {
 
 	case 'set':
 		if (isset($admin->q[2]) && in_array($admin->q[2], $themes)) {
-			global $db;
-
 			$theme_name = $admin->q[2];
 
-			$db->prepare('UPDATE ' . DB_PRFX . 'config SET value = ? WHERE name = ?')->execute([$theme_name, 'theme']);
+			$admin->db->prepare('UPDATE ' . DB_PRFX . 'config SET value = ? WHERE name = ?')->execute([$theme_name, 'theme']);
 		}
 
 		redirect(BASE . '/' . ADMIN_DIR . '/themes');

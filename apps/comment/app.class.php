@@ -1,19 +1,21 @@
 <?php
 
 class CommentApp {
+	private $db;
+
 	private $setup;
 
-	public function __construct() {
+	public function __construct($registry) {
+		$this->db = $registry->db;
+
 		$setup = load_lib('setup', true, true);
 
 		$this->setup = $setup;
 	}
 
 	public function install() {
-		global $db;
-
 		// create comments table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'comments (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'comments (
 	id int(11) NOT NULL,
 	post int(11) NOT NULL,
 	name varchar(256) NOT NULL,
@@ -27,10 +29,10 @@ class CommentApp {
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'comments ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'comments ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'comments MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'comments MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// item(s) for admin panel navigation
 		$this->setup->add_adminnav([
@@ -54,10 +56,8 @@ class CommentApp {
 	}
 
 	public function uninstall() {
-		global $db;
-
 		// drop comments table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'comments');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'comments');
 
 		// remove admin navigation items
 		$this->setup->adminnav_delete('comment');

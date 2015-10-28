@@ -8,7 +8,18 @@
  * @copyright 2009-2015 Limny
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Widget extends CoreModel {
+class Widget {
+	// database connection
+	private $db;
+	
+	/**
+	 * set database connection property
+	 * @param object $registry
+	 */
+	public function __construct($registry) {
+		$this->db = $registry->db;
+	}
+
 	/**
 	 * fetch widgets by position
 	 * positions are defined in theme schema.tpl

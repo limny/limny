@@ -17,8 +17,6 @@ $form->form_options = [
 ];
 
 if (isset($_POST['update'])) {
-	global $db;
-
 	$fields = array_keys(array_slice($form->form_options, 0, 3));
 
 	foreach ($fields as $field)
@@ -40,7 +38,7 @@ if (isset($_POST['update'])) {
 				if ($new_password === $repeat_new_password) {
 					$new_password = $password_hash->HashPassword($new_password);
 
-					$db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE id = ?')->execute([$new_password, $_SESSION['limny']['admin']['id']]);
+					$admin->db->prepare('UPDATE ' . DB_PRFX . 'users SET password = ? WHERE id = ?')->execute([$new_password, $_SESSION['limny']['admin']['id']]);
 
 					$_SESSION['limny']['admin']['password'] = $new_password;
 				} else
@@ -50,7 +48,7 @@ if (isset($_POST['update'])) {
 
 			$values[] = $_SESSION['limny']['admin']['id'];
 
-			$db->prepare('UPDATE ' . DB_PRFX . 'profiles SET ' . implode(', ', $columns) . ' WHERE id = ?')->execute($values);
+			$admin->db->prepare('UPDATE ' . DB_PRFX . 'profiles SET ' . implode(', ', $columns) . ' WHERE id = ?')->execute($values);
 
 			redirect(BASE . '/' . ADMIN_DIR . '/profile/success');
 		}
@@ -59,7 +57,7 @@ if (isset($_POST['update'])) {
 	}
 }
 
-$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'profiles WHERE user = ?');
+$result = $admin->db->prepare('SELECT * FROM ' . DB_PRFX . 'profiles WHERE user = ?');
 $result->execute([$_SESSION['limny']['admin']['id']]);
 $profile = $result->fetch(PDO::FETCH_ASSOC);
 

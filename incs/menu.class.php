@@ -9,19 +9,25 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Menu {
+	private $registry;
+
+	/**
+	 * set registry property
+	 * @param [type] $registry [description]
+	 */
+	public function __construct($registry) {
+		$this->registry = $registry;
+	}
+
 	/**
 	 * get menu items as an array
 	 * selected item specified with different index name
 	 * @return array/boolean boolean as error
 	 */
 	public function items() {
-		global $db;
+		$current_q = count($this->registry->q['param']) > 0 ? implode('/', $this->registry->q['param']) : null;
 
-		$q = query();
-
-		$current_q = count($q['param']) > 0 ? implode('/', $q['param']) : null;
-
-		$result = $db->query('SELECT * FROM ' . DB_PRFX . 'menu WHERE enabled = 1 ORDER BY sort');
+		$result = $this->registry->db->query('SELECT * FROM ' . DB_PRFX . 'menu WHERE enabled = 1 ORDER BY sort');
 		while ($item = $result->fetch(PDO::FETCH_ASSOC)) {
 			if (empty($item['address']) === false && strlen($item['address']) > 2 && substr($item['address'], 0, 1) === '[' && substr($item['address'], -1) === ']')
 				$item['address'] = url(substr($item['address'], 1, -1));

@@ -55,8 +55,6 @@ $form->form_options = [
 ];
 
 if (isset($_POST['update']) && $security_config_update) {
-	global $db;
-
 	$fields = array_keys($form->form_options);
 
 	foreach ($fields as $field)
@@ -66,18 +64,18 @@ if (isset($_POST['update']) && $security_config_update) {
 			else if ($field === 'smtp_password' && empty($_POST['smtp_password']))
 				continue;
 			
-			$case_statement[] = 'WHEN ' . $db->quote($field) . ' THEN :' . $field;
+			$case_statement[] = 'WHEN ' . $admin->db->quote($field) . ' THEN :' . $field;
 			$values_array[':' . $field] = $_POST[$field];
 		}
 
 	if (isset($case_statement) && isset($values_array)) {
-		$db->prepare('UPDATE ' . DB_PRFX . 'config SET value = CASE name ' . implode(' ', $case_statement) . ' ELSE value END')->execute($values_array);
+		$admin->db->prepare('UPDATE ' . DB_PRFX . 'config SET value = CASE name ' . implode(' ', $case_statement) . ' ELSE value END')->execute($values_array);
 
 		redirect(BASE . '/' . ADMIN_DIR . '/config/updated');
 	}
 }
 
-$config_values = (array) $config->config;
+$config_values = (array) $admin->config;
 $form->form_values = $config_values;
 
 $form_items = $form->fields();

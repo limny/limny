@@ -1,9 +1,16 @@
 <?php
 
-class Application {
+class Application extends Admin {
 	public $apps_path;
 
-	public function __construct() {
+	public $db;
+
+	private $registry;
+
+	public function __construct($registry) {
+		$this->db = $registry->db;
+		$this->registry = $registry;
+
 		$this->apps_path = PATH . DS . 'apps';
 	}
 
@@ -18,15 +25,13 @@ class Application {
 	}
 
 	public function apps($enabled = null, $type = null) {
-		global $db;
-
 		if (empty($enabled) === false) {
 			$enabled = '1';
 			$clause = 'WHERE enabled = ?';
 		} else
 			$clause = '';
 		
-		$result = $db->prepare('SELECT * FROM ' . DB_PRFX . 'apps ' . $clause);
+		$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'apps ' . $clause);
 		$binds = empty($clause) ? [] : [$enabled];
 		$result->execute($binds);
 		$apps = [];
@@ -52,14 +57,12 @@ class Application {
 	}
 
 	public function update_enabled($app_id, $enabled) {
-		global $db;
-
 		if ($enabled === 'true')
 			$enabled = '1';
 		else
 			$enabled = '0';
 
-		$db->prepare('UPDATE ' . DB_PRFX . 'apps SET enabled = ? WHERE id = ?')->execute([$enabled, $app_id]);
+		$this->db->prepare('UPDATE ' . DB_PRFX . 'apps SET enabled = ? WHERE id = ?')->execute([$enabled, $app_id]);
 
 		return 'OK';
 	}
@@ -73,7 +76,7 @@ class Application {
 			$app_class = ucfirst($app_name) . 'App';
 
 			if (class_exists($app_class)) {
-				$app_object = new $app_class();
+				$app_object = new $app_class($this->registry);
 
 				return $app_object;
 			}
@@ -83,9 +86,7 @@ class Application {
 	}
 
 	public function uninstall_app($app_id) {
-		global $db;
-
-		$result = $db->prepare('SELECT name, required_by FROM ' . DB_PRFX . 'apps WHERE id = ?');
+		$result = $this->db->prepare('SELECT name, required_by FROM ' . DB_PRFX . 'apps WHERE id = ?');
 		$result->execute([$app_id]);
 		
 		if ($app = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -93,7 +94,7 @@ class Application {
 			if (empty($app['required_by']) === false)
 				return false;
 			
-			$result = $db->prepare('SELECT id, required_by FROM ' . DB_PRFX . 'apps WHERE FIND_IN_SET(?, required_by)');
+			$result = $this->db->prepare('SELECT id, required_by FROM ' . DB_PRFX . 'apps WHERE FIND_IN_SET(?, required_by)');
 			$result->execute([$app['name']]);
 
 			while ($dependent = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -102,7 +103,7 @@ class Application {
 				if (($key = array_search($app['name'], $required_by)) !== false) {
 					unset($required_by[$key]);
 
-					$update = $db->prepare('UPDATE ' . DB_PRFX . 'apps SET required_by = ? WHERE id = ?');
+					$update = $this->db->prepare('UPDATE ' . DB_PRFX . 'apps SET required_by = ? WHERE id = ?');
 					$update->execute([implode(',', $required_by), $dependent['id']]);
 				}
 			}
@@ -111,14 +112,14 @@ class Application {
 				if (method_exists($app_object, 'uninstall'))
 					$app_object->uninstall();
 
-			$db->prepare('DELETE FROM ' . DB_PRFX . 'apps WHERE id = ?')->execute([$app_id]);
+			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'apps WHERE id = ?')->execute([$app_id]);
 		}
 		
 		return true;
 	}
 
 	public function install_app($app_name) {
-		global $db, $admin;
+		global $admin;
 
 		$apps = $this->apps();
 		if (in_array($app_name, array_keys($apps)))
@@ -153,7 +154,7 @@ class Application {
 					if (($space_pos = strpos($app, ' ')) !== false)
 						$app = trim(substr($app, 0, $space_pos));
 
-					$db->prepare('UPDATE ' . DB_PRFX . 'apps SET required_by = IF(required_by IS NULL OR required_by = \'\', ?, CONCAT(required_by, \',\', ?)) WHERE name = ?')->execute([$app_name, $app_name, $app]);
+					$this->db->prepare('UPDATE ' . DB_PRFX . 'apps SET required_by = IF(required_by IS NULL OR required_by = \'\', ?, CONCAT(required_by, \',\', ?)) WHERE name = ?')->execute([$app_name, $app_name, $app]);
 				}
 
 			}
@@ -164,7 +165,7 @@ class Application {
 			if (method_exists($app_object, 'install'))
 				$app_object->install();
 
-		$db->prepare('INSERT INTO ' . DB_PRFX . 'apps (name, enabled, required_by) VALUES (?, 0, null)')->execute([$app_name]);
+		$this->db->prepare('INSERT INTO ' . DB_PRFX . 'apps (name, enabled, required_by) VALUES (?, 0, null)')->execute([$app_name]);
 		
 		return true;
 	}
@@ -197,7 +198,7 @@ class Application {
 			if (class_exists($app_controller_name) === false)
 				die('Limny error: Application admin controller not found.');
 
-			$app_controller = new $app_controller_name();
+			$app_controller = new $app_controller_name($this->registry);
 
 			$app_controller->q = $q;
 

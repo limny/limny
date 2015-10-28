@@ -9,8 +9,8 @@ class GalleryAdminController extends Manage {
 
 	public $manage_upload_path = PATH . DS . 'uploads';
 
-	public function __construct() {
-		parent::__construct();
+	public function __construct($registry) {
+		parent::__construct($registry);
 
 		$this->manage_q = $this->q;
 	}

@@ -1,19 +1,21 @@
 <?php
 
 class PostApp {
+	private $db;
+
 	private $setup;
 
-	public function __construct() {
+	public function __construct($registry) {
+		$this->db = $registry;
+
 		$setup = load_lib('setup', true, true);
 
 		$this->setup = $setup;
 	}
 
 	public function install() {
-		global $db;
-
 		// create posts table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'posts (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'posts (
 	id int(11) NOT NULL,
 	title varchar(256) NOT NULL,
 	text longtext NOT NULL,
@@ -27,22 +29,22 @@ class PostApp {
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'posts ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'posts ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'posts MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'posts MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// create categories table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'posts_cats (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'posts_cats (
 	id int(11) NOT NULL,
 	name varchar(256) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'posts_cats ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'posts_cats ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'posts_cats MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'posts_cats MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// item(s) for admin panel navigation
 		$this->setup->add_adminnav([
@@ -70,10 +72,8 @@ class PostApp {
 	}
 
 	public function uninstall() {
-		global $db;
-
 		// delete uploaded files
-		$result = $db->query('SELECT image FROM ' . DB_PRFX . 'posts');
+		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'posts');
 		$result->execute();
 		while ($post = $result->fetch(PDO::FETCH_ASSOC)) {
 			if (empty($post['image']))
@@ -86,13 +86,13 @@ class PostApp {
 		}
 
 		// delete permalinks
-		$db->exec('DELETE FROM ' . DB_PRFX . 'permalinks WHERE query = \'post\' OR query LIKE \'post%\'');
+		$this->db->exec('DELETE FROM ' . DB_PRFX . 'permalinks WHERE query = \'post\' OR query LIKE \'post%\'');
 		
 		// drop posts table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'posts');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'posts');
 
 		// drop categories table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'posts_cats');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'posts_cats');
 
 		// remove admin navigation items
 		$this->setup->adminnav_delete('post');

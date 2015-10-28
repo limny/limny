@@ -3,10 +3,12 @@
 class Comment {
 	public $head;
 
-	public function __construct() {
+	public function __construct($registry) {
 		$this->head = load_css('comment', 'style.css');
 
 		require_once PATH . DS . 'apps' . DS . 'comment' . DS . 'model.class.php';
+		
+		CommentModel::$db = $registry->db;
 	}
 
 	public function comment($post, $replyto = null) {

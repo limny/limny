@@ -8,6 +8,10 @@ class GalleryController {
 	public $title;
 	public $content;
 
+	public function GalleryController($registry) {
+		GalleryModel::$db = $registry->db;
+	}
+
 	public function __global() {
 		$this->head = load_css('gallery', 'style.css');
 

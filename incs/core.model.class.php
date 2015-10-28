@@ -1,45 +1,23 @@
 <?php
 
 class CoreModel {
-	public $db;
-	public $lib;
-	
-	public function __construct() {
-		global $db;
+	public function __construct($registry) {
+		$db = new Database(DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME);
 		
-		$this->db = $db;
+		if (file_exists(PATH . DS . 'install') && is_dir(PATH . DS . 'install'))
+			die('Limny error: Please delete <em>install</em> directory.');
+
+		$registry->db = $db;
 		
+		$this->config($registry);
 	}
 
-	public function __get($lib_name) {
-		if (isset($this->lib->lib_name))
-			return $this->lib->$lib_name;
+	private function config($registry) {
+		$registry->config = (object) ['core' => 'limny'];
 
-		$lib_name = str_replace(['.', '/', '\\'], '', $lib_name);
-		$lib_file = PATH . DS . 'incs' . DS . $lib_name . '.class.php';
-		
-		if (file_exists($lib_file)) {
-			require_once $lib_file;
-
-			$class_name = ucfirst($lib_name);
-			
-			if (class_exists($class_name)) {
-				global $db;
-
-				$lib_class = new $class_name($db);
-
-				if (property_exists($lib_class, 'db'))
-					$lib_class->db = $this->db;
-				
-				settype($this->lib, 'object');
-
-				$this->lib->$lib_name = $lib_class;
-
-				return $this->lib->$lib_name;
-			} else
-				die("Limny error: Library class <em>$lib_name</em> not found.");
-		} else
-			die("Limny error: Library file <em>$lib_name</em> not found.");
+		$result = $registry->db->query('SELECT * FROM ' . DB_PRFX . 'config');
+		while ($config = $result->fetch(PDO::FETCH_ASSOC))
+			$registry->config->{$config['name']} = $config['value'];
 	}
 }
 

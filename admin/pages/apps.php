@@ -1,7 +1,6 @@
 <?php
 
-require_once PATH . DS . 'admin' . DS . 'application.class.php';
-$application = new Application;
+$application = load_lib('application', true, true);
 
 $security_app_install = defined('APPLICATION_INSTALL') === false || APPLICATION_INSTALL === true;
 $security_app_enabled = defined('APPLICATION_ENABLED') === false || APPLICATION_ENABLED === true;
@@ -64,7 +63,7 @@ if (count($installed_apps) > 0 || count($uninstalled_apps) > 0) {
 	}
 
 	if (count($uninstalled_apps) > 0) {
-		$core_version = $config->config->version;
+		$core_version = $admin->config->version;
 		
 		$admin->content .= '<h3>' . UNINSTALLED . '</h3>
 <table class="table apps">

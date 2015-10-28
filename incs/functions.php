@@ -100,8 +100,10 @@ function load_lib($lib_name, $return_object = true, $admin_lib = false, $paramet
 
 			if (class_exists($object_name) === false)
 				return false;
+
+			global $registry;
 			
-			$lib_object = new $object_name($parameters);
+			$lib_object = new $object_name($registry, $parameters);
 
 			return $lib_object;
 		}
@@ -140,12 +142,12 @@ function substring($string, $start_char, $end_char) {
  * @return boolean/string                    return boolean on error
  */
 function system_date($date_or_timestamp, $format = null) {
-	global $db, $config;
+	global $registry;
 
-	$calendar = $config->config->calendar;
+	$calendar = $registry->config->calendar;
 
 	if (empty($format))
-		$format = $config->config->date_format;
+		$format = $registry->config->date_format;
 
 	$is_timestamp = is_numeric($date_or_timestamp);
 	$date_in_format = $is_timestamp ? date($format, $date_or_timestamp) : $date_or_timestamp;
@@ -216,7 +218,7 @@ function query($q = null) {
  * @return string
  */
 function url($query, $full = false, $lang_if_exists = true) {
-	global $config;
+	global $registry;
 
 	if (is_array($query))
 		$query = implode('/', $query);
@@ -224,20 +226,18 @@ function url($query, $full = false, $lang_if_exists = true) {
 	$url = '';
 
 	if ($full === true)
-		$url .= $config->config->address;
+		$url .= $registry->config->address;
 	else
 		$url .= BASE . (substr(BASE, -6) === '/admin' ? '/..' : null);
 
 	$url .= '/';
 
-	if ($config->config->url_mode === 'simple')
+	if ($registry->config->url_mode === 'simple')
 		$url .= 'indx.php?q=';
 
 	if ($lang_if_exists === true) {
-		global $q;
-
-		if (isset($q['lang']))
-			$url .= $q['lang'] . '/';
+		if (isset($registry->q) && isset($registry->q['lang']))
+			$url .= $registry->q['lang'] . '/';
 	}
 
 	$url .= $query;
@@ -277,20 +277,20 @@ function rand_hash($length = 32) {
  * @return boolean
  */
 function send_mail($to, $subject, $message, $attachments = []) {
-	global $config;
+	global $registry;
 
 	require_once PATH . DS . 'incs' . DS . 'phpmailer' . DS . 'PHPMailerAutoload.php';
 	$mail = new PHPMailer;
 	
 	$mail->isSMTP();
 	$mail->SMTPDebug = 0;
-	$mail->Host = $config->config->smtp_host;
-	$mail->Port = $config->config->smtp_port;
-	$mail->SMTPSecure = $config->config->smtp_security;
-	$mail->SMTPAuth = empty($config->config->smtp_auth) ? false : true;
-	$mail->Username = $config->config->smtp_username;
-	$mail->Password = $config->config->smtp_password;
-	$mail->setFrom($config->config->smtp_username, $config->config->title);
+	$mail->Host = $registry->config->smtp_host;
+	$mail->Port = $registry->config->smtp_port;
+	$mail->SMTPSecure = $registry->config->smtp_security;
+	$mail->SMTPAuth = empty($registry->config->smtp_auth) ? false : true;
+	$mail->Username = $registry->config->smtp_username;
+	$mail->Password = $registry->config->smtp_password;
+	$mail->setFrom($registry->config->smtp_username, $registry->config->title);
 	$mail->Subject = $subject;
 	$mail->msgHTML($message);
 
@@ -325,9 +325,9 @@ function load_view($app_name, $view_name, $vars = []) {
 	if (isset($vars['vars']) || isset($vars['view_file']))
 		die('Limny error: It\'s not possible to use <em>vars</em> and <em>view_file</em> names for variables');
 
-	global $config;
+	global $registry;
 
-	$theme = $config->config->theme;
+	$theme = $registry->config->theme;
 
 	$theme_view = PATH . DS . 'themes' . DS . $theme . DS . 'views' . DS . $app_name . '-' . $view_name;
 	$app_view = PATH . DS . 'apps' . DS . $app_name . DS . 'views' . DS . $view_name;
@@ -372,9 +372,9 @@ function nav($items) {
  * @return string/boolean           boolean on error
  */
 function load_css($app_name, $css_name) {
-	global $config;
+	global $registry;
 
-	$theme = $config->config->theme;
+	$theme = $registry->config->theme;
 
 	$theme_css = 'themes' . DS . $theme . DS . 'css' . DS . $app_name . '-' . $css_name;
 	$app_css = 'apps' . DS . $app_name . DS . 'css' . DS . $css_name;
@@ -453,14 +453,14 @@ function user_signed_in() {
  * @return string language name in two characters
  */
 function language() {
-	global $config;
+	global $registry;
 
-	$q = query();
+	//$q = query();
 
-	if (isset($q['lang']))
-		return $q['lang'];
+	if (isset($registry->q['lang']))
+		return $registry->q['lang'];
 	
-	return $config->config->language;
+	return $registry->config->language;
 }
 
 ?>

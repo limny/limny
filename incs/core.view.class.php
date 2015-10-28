@@ -1,9 +1,6 @@
 <?php
 
 class CoreView {
-	public $q;
-	public $model;
-	
 	public $head;
 	public $title;
 	public $content;
@@ -15,20 +12,22 @@ class CoreView {
 
 	private $theme;
 	private $theme_path;
+
+	private $registry;
+
+	private $widget_lib;
 	
-	public function __construct($q) {
-		$this->q = $q;
+	public function __construct($registry) {
+		$this->registry = $registry;
 
-		$this->model = new CoreModel();
-
-		if (isset($q['lang']))
-			$this->language = $q['lang'];
+		if (isset($registry->q['lang']))
+			$this->language = $registry->q['lang'];
 
 		if (empty($this->language))
-			$this->language = $this->model->config->config->language;
+			$this->language = $registry->config->language;
 
 		$lang_file = PATH . DS . 'langs' . DS . $this->language . DS . 'main.php';
-			
+		
 		if (file_exists($lang_file)) {
 			require_once $lang_file;
 
@@ -42,16 +41,18 @@ class CoreView {
 		if (admin_signed_in() === true && isset($_GET['theme']))
 			$theme = $_GET['theme'];
 		else
-			$theme = $this->model->config->config->theme;
+			$theme = $registry->config->theme;
 
 		$this->cache_path = PATH . DS . 'cache';
 
 		$this->theme = preg_replace('/[^a-zA-Z0-9]/', '', $theme);
 		$this->theme_path = PATH . DS . 'themes' . DS . $this->theme . DS;
+
+		$this->widget_lib = load_lib('widget');
 	}
 	
 	public function __get($widgets_position) {
-		if ($widgets = $this->model->widget->widgets($widgets_position)) {
+		if ($widgets = $this->widget_lib->widgets($widgets_position)) {
 			foreach ($widgets as $widget_item) {
 				$widget = (object) [];
 
@@ -70,7 +71,7 @@ class CoreView {
 								$object_name = ucfirst($object_name);
 
 								if (class_exists($object_name)) {
-									$widget_object = new $object_name();
+									$widget_object = new $object_name($this->registry);
 
 									if (method_exists($widget_object, $widget_item['method'])) {
 										$widget_array = $widget_object->{$widget_item['method']}();
@@ -127,7 +128,7 @@ class CoreView {
 					}
 
 					if (isset($widget_item['lifetime']) && $widget_item['lifetime'] > 0) {
-						$this->model->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET lifetime = UNIX_TIMESTAMP() + ? WHERE id = ?')->execute([$widget_item['lifetime'], $widget_item['id']]);
+						$this->registry->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET lifetime = UNIX_TIMESTAMP() + ? WHERE id = ?')->execute([$widget_item['lifetime'], $widget_item['id']]);
 						
 						file_put_contents($this->cache_path . DS . md5($widget_item['id'] . $widget_item['app'] . $widget_item['method']), serialize(['title' => $widget->title, 'content' => $widget->content, 'cache' => true]));
 					}
@@ -144,7 +145,7 @@ class CoreView {
 	}
 	
 	public function render() {
-		if (count($this->q['param']) > 0 && file_exists($this->theme_path . 'page.tpl'))
+		if (count($this->registry->q['param']) > 0 && file_exists($this->theme_path . 'page.tpl'))
 			include $this->theme_path . 'page.tpl';
 		else if (file_exists($this->theme_path . 'index.tpl'))
 			include $this->theme_path . 'index.tpl';

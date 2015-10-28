@@ -8,6 +8,10 @@ class PageController {
 	public $title;
 	public $content;
 
+	public function PageController($registry) {
+		PageModel::$db = $registry->db;
+	}
+
 	public function __global() {
 		if (isset($this->q['param'][1]) && is_numeric($this->q['param'][1]))
 			return $this->page($this->q['param'][1]);

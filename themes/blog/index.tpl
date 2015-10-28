@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="<?=$this->model->config->config->language?>">
+<html lang="<?=$this->registry->config->language?>">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="<?=$this->model->config->config->description?>">
+	<meta name="description" content="<?=$this->registry->config->description?>">
 
 	<title><?=$this->title?></title>
 
@@ -34,7 +34,7 @@
 			<nav class="blog-nav">
 		<?php
 
-		$menu = load_lib('menu');
+		$menu = load_lib('menu', true, false, $this->registry);
 		
 		foreach ($menu->items() as $selected => $item)
 			echo '<a class="blog-nav-item' . ($selected === 'selected' ? ' active' : null) . '" href="' . (empty($item['address']) ? BASE : $item['address']) . '">' . $item['name'] . '</a>';
@@ -47,8 +47,8 @@
 	<div class="container">
 
 		<div class="blog-header">
-			<h1 class="blog-title"><?=$this->model->config->config->header?></h1>
-			<p class="lead blog-description"><?=$this->model->config->config->motto?></p>
+			<h1 class="blog-title"><?=$this->registry->config->header?></h1>
+			<p class="lead blog-description"><?=$this->registry->config->motto?></p>
 			<?=$this->header?>
 		</div>
 
@@ -68,7 +68,7 @@
 
 	<div class="blog-footer">
 		<?=$this->footer?>
-		<p><?=$this->model->config->config->footer?></p>
+		<p><?=$this->registry->config->footer?></p>
 		<p>Powered by <a href="http://www.limny.org">Limny</a><br>Blog template by <a href="https://twitter.com/mdo">@mdo</a></p>
 		<p><a href="#">Back to top</a></p>
 	</div>

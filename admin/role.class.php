@@ -29,8 +29,8 @@ class Role extends Manage {
 		'permissions' => PERMISSIONS
 	];
 	
-	public function Role($parameters = []) {
-		parent::__construct($parameters);
+	public function Role($registry, $parameters = []) {
+		parent::__construct($registry, $parameters);
 
 		$this->manage_action->list->name = 'role_name';
 
@@ -104,9 +104,7 @@ class Role extends Manage {
 	}
 
 	public function role_name($name, $data = [], $files = [], $id = null) {
-		global $db;
-
-		$result = $db->prepare('SELECT COUNT(*) AS count FROM ' . DB_PRFX . 'users WHERE FIND_IN_SET(?, roles) > 0');
+		$result = $this->db->prepare('SELECT COUNT(*) AS count FROM ' . DB_PRFX . 'users WHERE FIND_IN_SET(?, roles) > 0');
 		$result->execute([$id]);
 
 		return $name . ' <span class="text-gray">(' . $result->fetchColumn() . ')</span>';

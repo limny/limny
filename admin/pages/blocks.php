@@ -1,6 +1,6 @@
 <?php
 
-$theme = $config->config->theme;
+$theme = $admin->config->theme;
 
 $theme_schema = PATH . DS . 'themes' . DS . $theme . DS . 'schema.tpl';
 
@@ -21,9 +21,8 @@ if (file_exists($theme_schema)) {
 			$theme_positions[] = $position;
 	}
 
-	require_once PATH . DS . 'incs' . DS . 'form.class.php';
-	require_once PATH . DS . 'admin' . DS . 'widget.class.php';
-	$widget = new Widget;
+	load_lib('form');
+	$widget = load_lib('widget', true, true);
 
 	if (isset($_POST['action']))
 		switch ($_POST['action']) {

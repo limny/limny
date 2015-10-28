@@ -1,19 +1,21 @@
 <?php
 
 class PageApp {
+	private $db;
+
 	private $setup;
 
-	public function __construct() {
+	public function __construct($registry) {
+		$this->db = $registry->db;
+
 		$setup = load_lib('setup', true, true);
 
 		$this->setup = $setup;
 	}
 
 	public function install() {
-		global $db;
-
 		// create pages table
-		$db->exec('CREATE TABLE ' . DB_PRFX . 'pages (
+		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'pages (
 	id int(11) NOT NULL,
 	title varchar(256) NOT NULL,
 	text longtext NOT NULL,
@@ -23,10 +25,10 @@ class PageApp {
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8');
 
 		// modify id column as primary key
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'pages ADD PRIMARY KEY (id)');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'pages ADD PRIMARY KEY (id)');
 
 		// set id columns as auto increment
-		$db->exec('ALTER TABLE ' . DB_PRFX . 'pages MODIFY id int(11) NOT NULL AUTO_INCREMENT');
+		$this->db->exec('ALTER TABLE ' . DB_PRFX . 'pages MODIFY id int(11) NOT NULL AUTO_INCREMENT');
 
 		// item(s) for admin panel navigation
 		$this->setup->add_adminnav([
@@ -47,10 +49,8 @@ class PageApp {
 	}
 
 	public function uninstall() {
-		global $db;
-
 		// delete uploaded files
-		$result = $db->query('SELECT image FROM ' . DB_PRFX . 'pages');
+		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'pages');
 		$result->execute();
 		while ($page = $result->fetch(PDO::FETCH_ASSOC)) {
 			if (empty($page['image']))
@@ -63,10 +63,10 @@ class PageApp {
 		}
 
 		// delete permalinks
-		$db->exec('DELETE FROM ' . DB_PRFX . 'permalinks WHERE query = \'page\' OR query LIKE \'page%\'');
+		$this->db->exec('DELETE FROM ' . DB_PRFX . 'permalinks WHERE query = \'page\' OR query LIKE \'page%\'');
 
 		// drop pages table
-		$db->exec('DROP TABLE ' . DB_PRFX . 'pages');
+		$this->db->exec('DROP TABLE ' . DB_PRFX . 'pages');
 
 		// remove admin navigation items
 		$this->setup->adminnav_delete('page');

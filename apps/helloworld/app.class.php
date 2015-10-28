@@ -6,10 +6,14 @@
  * application class name must start in upper case and end with "App"
  */
 class HelloworldApp {
+	private $db;
+
 	private $setup;
 
 	// loads setup library for both install and uninstall methods
-	public function __construct() {
+	public function __construct($registry) {
+		$this->db = $registry->db;
+
 		$setup = load_lib('setup', true, true);
 
 		$this->setup = $setup;
@@ -21,11 +25,9 @@ class HelloworldApp {
 	 * @return boolean
 	 */
 	public function install() {
-		global $db;
-
 		// add widget
 		// look widget.class.php in app directory
-		$db->exec('INSERT INTO ' . DB_PRFX . 'widgets (app, method, position, roles, languages, sort) VALUE (\'helloworld\', \'helloworld_foobar_widget\', \'none\', \'all\', \'all\', 1)');
+		$this->db->exec('INSERT INTO ' . DB_PRFX . 'widgets (app, method, position, roles, languages, sort) VALUE (\'helloworld\', \'helloworld_foobar_widget\', \'none\', \'all\', \'all\', 1)');
 
 		// items for admin panel navigation
 		// shown in sidebar
@@ -56,10 +58,8 @@ class HelloworldApp {
 	 * @return boolean
 	 */
 	public function uninstall() {
-		global $db;
-
 		// delete widget
-		$db->exec('DELETE FROM ' . DB_PRFX . 'widgets WHERE app = \'helloworld\'');
+		$this->db->exec('DELETE FROM ' . DB_PRFX . 'widgets WHERE app = \'helloworld\'');
 
 		// remove admin navigation items
 		$this->setup->adminnav_delete('helloworld');

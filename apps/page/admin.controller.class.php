@@ -7,8 +7,10 @@ class PageAdminController extends Manage {
 	public $title;
 	public $content;
 
-	public function __construct() {
-		parent::__construct();
+	public function __construct($registry) {
+		parent::__construct($registry);
+
+		PageAdminModel::$db = $registry->db;
 
 		$this->manage_q = $this->q;
 	}

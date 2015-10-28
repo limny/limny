@@ -9,33 +9,50 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class CoreController {
+	// language code (ISO 639-1)
+	public $language;
+
 	// view object
 	public $view;
 
-	// current language code (ISO 639-1)
-	public $language;
-
-	// current query parameter
+	// query parameter
 	private $q;
 
 	// predefined head tags
 	private $head;
+
+	// model object
+	private $model;
+
+	// application library
+	private $app_lib;
+
+	// registry
+	private $registry;
 	
 	/**
 	 * set necessary properties
+	 * @param object $registry
+	 * @return void
 	 */
-	public function __construct($q) {
-		$this->q = $q;
-		$this->view = new CoreView($this->q);
+	public function __construct($registry) {
+		$this->model = new CoreModel($registry);
+
+		$this->q = $registry->q;
+		$this->registry = $registry;
+		$this->app_lib = load_lib('application');
+
+		$this->view = new CoreView($registry);
 
 		$this->head = '<link href="' . BASE . '/misc/css/style.css" rel="stylesheet">' . "\n" . '<script type="text/javascript" src="' . BASE . '/misc/js/script.js"></script>';
 	}
 
 	/**
 	 * launch available startups for enabled applications
+	 * @return void
 	 */
 	private function __startup() {
-		$apps = $this->view->model->application->apps('1');
+		$apps = $this->app_lib->apps('1');
 
 		foreach ($apps as $app) {
 			$startup = PATH . DS . 'apps' . DS . $app['name'] . DS . 'startup.php';
@@ -54,7 +71,7 @@ class CoreController {
 			$this->language = $this->q['lang'];
 		
 		if (empty($this->langauge)) {
-			$this->language = $this->view->model->config->config->language;
+			$this->language = $this->registry->config->language;
 
 			$lang_file = PATH . DS . 'langs' . DS . $this->language . DS . 'main.php';
 			
@@ -73,15 +90,15 @@ class CoreController {
 	 */
 	private function default_content() {
 		if (empty($this->q['param'][0])) {
-			$default = $this->view->model->config->config->default_content;
+			$default = $this->registry->config->default_content;
 			
 			if ($default == 'app')
-				$this->q['param'] = [$this->view->model->config->config->default_app];
+				$this->q['param'] = [$this->registry->config->default_app];
 			else if ($default == 'query')
-				$this->q['param'] = explode('/', $this->view->model->config->config->default_query);
+				$this->q['param'] = explode('/', $this->registry->config->default_query);
 			else if ($default == 'text') {
-				$this->view->title = $this->view->model->config->config->title;
-				$this->view->content = $this->view->model->config->config->default_text;
+				$this->view->title = $this->registry->config->title;
+				$this->view->content = $this->registry->config->default_text;
 			}
 		}
 
@@ -94,12 +111,13 @@ class CoreController {
 	 */
 	private function user_content() {
 		$user = load_lib('user');
+
 		$user_method = 'page_' . (isset($this->q['param'][1]) ? $this->q['param'][1] : 'default');
 		
 		if (method_exists($user, $user_method)) {
 			$user->{$user_method}();
 
-			$this->view->title = $user->title . ' - ' . $this->view->model->config->config->title;
+			$this->view->title = $user->title . ' - ' . $this->registry->config->title;
 			$this->view->content = $user->content;
 		}
 
@@ -157,7 +175,7 @@ class CoreController {
 		$app_class = ucfirst($app_name) . 'Controller';
 		
 		if (class_exists($app_class)) {
-			$app_controller = new $app_class($this->q);
+			$app_controller = new $app_class($this->registry);
 			$app_controller->q = $this->q;
 		} else
 			die('Limny error: Application controller class not found.');
@@ -188,7 +206,7 @@ class CoreController {
 			require_once $app_path . 'model.class.php';
 
 		$this->view->head = $app_controller->head;
-		$this->view->title =  $this->view->model->config->config->title;
+		$this->view->title =  $this->registry->config->title;
 		
 		if (empty($app_controller->title) === false)
 			$this->view->title = $app_controller->title . ' - ' . $this->view->title;
@@ -216,7 +234,7 @@ class CoreController {
 			'content' => $this->view->content,
 		]));
 		
-		$life_time = is_numeric($life_time) ? $life_time : $this->view->model->config->config->cache_lifetime;
+		$life_time = is_numeric($life_time) ? $life_time : $this->registry->config->cache_lifetime;
 		touch($cache_file, time() + $life_time);
 
 		return true;
@@ -224,6 +242,7 @@ class CoreController {
 
 	/**
 	 * initialize the system and show proper content
+	 * @return void
 	 */
 	public function init() {
 		$this->set_language();
@@ -241,9 +260,9 @@ class CoreController {
 
 			if (@$this->q['param'][0] === 'user')
 				$this->user_content();
-			else if ($this->view->model->application->app_installed($this->q['param'][0]) === false)
+			else if ($this->app_lib->app_installed($this->q['param'][0]) === false)
 				$this->error_message(ERROR, SENTENCE_1);
-			else if ($this->view->model->application->app_enabled($this->q['param'][0]) === false)
+			else if ($this->app_lib->app_enabled($this->q['param'][0]) === false)
 				$this->error_message(ERROR, SENTENCE_2);
 			else {
 				$cache_file = PATH . DS . 'cache' . DS . md5(implode('/', $this->q['param']));

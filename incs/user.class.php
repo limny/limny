@@ -539,7 +539,7 @@ class User extends Form {
 	 * @param  string $message
 	 * @return string
 	 */
-	public function email($message) {
+	private function email($message) {
 		$data = '<html>';
 		$data .= '<body>';
 		$data .= '<h2>' . $this->config->title . '</h2>';

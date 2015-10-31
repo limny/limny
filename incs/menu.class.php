@@ -9,11 +9,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Menu {
+	// registry values
 	private $registry;
 
 	/**
 	 * set registry property
-	 * @param [type] $registry [description]
+	 * @param object $registry
 	 */
 	public function __construct($registry) {
 		$this->registry = $registry;

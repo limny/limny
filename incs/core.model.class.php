@@ -1,6 +1,21 @@
 <?php
 
+/**
+ * Model object
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class CoreModel {
+	/**
+	 * create connection to database
+	 * check for install directory existence
+	 * load configuration
+	 * @param object $registry
+	 * @return void
+	 */
 	public function __construct($registry) {
 		$db = new Database(DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME);
 		
@@ -12,6 +27,11 @@ class CoreModel {
 		$this->config($registry);
 	}
 
+	/**
+	 * load configuration values and set to registry
+	 * @param  object $registry
+	 * @return void
+	 */
 	private function config($registry) {
 		$registry->config = (object) ['core' => 'limny'];
 

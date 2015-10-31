@@ -534,6 +534,11 @@ class User extends Form {
 			return ['danger', SENTENCE_30];
 	}
 
+	/**
+	 * user email template
+	 * @param  string $message
+	 * @return string
+	 */
 	public function email($message) {
 		$data = '<html>';
 		$data .= '<body>';

@@ -26,6 +26,7 @@ function def($name, $value, $case_insensitive = false) {
 /**
  * redirect page to entry URL
  * @param  string $url
+ * @return void
  */
 function redirect($url) {
 	header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');

@@ -1,22 +1,55 @@
 <?php
 
+/**
+ * Limny core view object
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class CoreView {
+	// HTML tags inside <head>
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	// system language
+	// based on browsing query parameter or configuration
 	public $language;
+
+	// page direction
+	// default value is false and means left-to-right
 	public $direction = false;
 	
+	// cache files directory
 	public $cache_path;
 
+	// system theme name
 	private $theme;
+
+	// system theme files path
 	private $theme_path;
 
+	// registry object
 	private $registry;
 
+	// widget library
 	private $widget_lib;
 	
+	/**
+	 * set system language
+	 * set page direction
+	 * set theme name and path
+	 * set cache directory path
+	 * load widget library
+	 * @param   object $registry
+	 * @return  void
+	 */
 	public function __construct($registry) {
 		$this->registry = $registry;
 
@@ -51,6 +84,11 @@ class CoreView {
 		$this->widget_lib = load_lib('widget');
 	}
 	
+	/**
+	 * get widgets by given position
+	 * @param  string $widgets_position theme position
+	 * @return boolean
+	 */
 	public function __get($widgets_position) {
 		if ($widgets = $this->widget_lib->widgets($widgets_position)) {
 			foreach ($widgets as $widget_item) {
@@ -144,6 +182,12 @@ class CoreView {
 		return false;
 	}
 	
+	/**
+	 * render page template file
+	 * page.tpl is an optional file for all pages except home page
+	 * if not exists all pages will be loaded by index.tpl
+	 * @return void
+	 */
 	public function render() {
 		if (count($this->registry->q['param']) > 0 && file_exists($this->theme_path . 'page.tpl'))
 			include $this->theme_path . 'page.tpl';
@@ -153,6 +197,10 @@ class CoreView {
 			die("Limny error: Theme files for <em>{$this->theme}</em> not found.");
 	}
 
+	/**
+	 * content value for it's widget
+	 * @return string
+	 */
 	public function content_widget() {
 		return $this->content;
 	}

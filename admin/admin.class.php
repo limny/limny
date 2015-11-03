@@ -1,15 +1,28 @@
 <?php
 
+/**
+ * Administration methods
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Admin {
+	// page query parameter
 	public $q;
+
+	// database connection
 	public $db;
 
+	// pages inside page.class.php
 	public $pages_in_method = [
 		'signin',
 		'signout',
 		'forgotpassword'
 	];
 
+	// pages inside pages directory
 	public $pages_in_file = [
 		'dashboard',
 		'blocks',
@@ -23,12 +36,23 @@ class Admin {
 		'menu'
 	];
 
+	// HTML tags inside <head>
 	public $head;
+	
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	// language direction
+	// false means left-to-right
 	public $direction = false;
 
+	/**
+	 * set database, configuration and page query parameter
+	 * @param object $registry
+	 */
 	public function __construct($registry){
 		$this->db = $registry->db;
 		$this->config = $registry->config;
@@ -42,6 +66,10 @@ class Admin {
 		return true;
 	}
 
+	/**
+	 * load proper language file
+	 * @return boolean
+	 */
 	public function load_language() {
 		$lang = $this->config->language;
 
@@ -62,6 +90,10 @@ class Admin {
 		die('Limny error: Language not found.');
 	}
 
+	/**
+	 * navigation panel in sidebar
+	 * @return boolean/string
+	 */
 	public function navigation() {
 		$result = $this->db->query('SELECT title, query FROM ' . DB_PRFX . 'adminnav ORDER BY id ASC');
 		
@@ -122,6 +154,13 @@ class Admin {
 		return $data;
 	}
 
+	/**
+	 * read constant from application language file
+	 * @param  string  $app            application name
+	 * @param  string  $title          constant name
+	 * @param  boolean $lang_is_loaded is language file already loaded
+	 * @return string
+	 */
 	public function item_title($app, $title, $lang_is_loaded = false) {
 		if (ctype_upper(str_replace('_', '', $title))) {
 			if ($lang_is_loaded === false)
@@ -134,6 +173,10 @@ class Admin {
 		return $title;
 	}
 
+	/**
+	 * set administrator authentication if sign-in information is stored
+	 * @return boolean
+	 */
 	public function is_remembered() {
 		if (isset($_COOKIE['limny_admin'])) {
 			$hash = $_COOKIE['limny_admin'];
@@ -159,6 +202,10 @@ class Admin {
 		return false;
 	}
 
+	/**
+	 * get available languages
+	 * @return array
+	 */
 	public function languages() {
 		$langs_path = PATH . DS . 'langs';
 		
@@ -180,6 +227,11 @@ class Admin {
 		return $langs;
 	}
 
+	/**
+	 * get language information
+	 * @param  string        $lang language code
+	 * @return array/boolean
+	 */
 	public function lang_info($lang) {
 		$lang_info_file = PATH . DS . 'langs' . DS . $lang . DS . 'lang.ini';
 		
@@ -189,6 +241,10 @@ class Admin {
 		return false;
 	}
 
+	/**
+	 * get system roles
+	 * @return array
+	 */
 	public function roles() {
 		$roles = [];
 		
@@ -200,6 +256,12 @@ class Admin {
 		return $roles;
 	}
 
+	/**
+	 * check compatibility version with core version
+	 * @param  string  $version
+	 * @param  string  $core
+	 * @return boolean
+	 */
 	public function is_compatible($version, $core) {
 		$version = (string) $version;
 		$core = (string) $core;
@@ -219,6 +281,10 @@ class Admin {
 		return true;
 	}
 
+	/**
+	 * get available themes
+	 * @return array
+	 */
 	public function themes() {
 		$themes_path = PATH . DS . 'themes';
 		
@@ -248,6 +314,11 @@ class Admin {
 		return $themes;
 	}
 
+	/**
+	 * load application language
+	 * @param  string $app_name
+	 * @return boolean
+	 */
 	public function app_load_language($app_name) {
 		$lang = $this->config->language;
 
@@ -265,6 +336,11 @@ class Admin {
 		return false;
 	}
 
+	/**
+	 * is there any application installed with given page query parameter
+	 * @param  array   $q page query parameter
+	 * @return boolean    [description]
+	 */
 	public function is_app($q = []) {
 		if (count($q) < 1)
 			$q = $this->q;

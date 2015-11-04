@@ -1,12 +1,27 @@
 <?php
 
+/**
+ * Administration application methods
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Application extends Admin {
+	// applications path
 	public $apps_path;
 
+	// database connection
 	public $db;
 
+	// registry object
 	private $registry;
 
+	/**
+	 * set database connection and registry property
+	 * @param void
+	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
 		$this->registry = $registry;
@@ -14,6 +29,10 @@ class Application extends Admin {
 		$this->apps_path = PATH . DS . 'apps';
 	}
 
+	/**
+	 * get list of all applications
+	 * @return array
+	 */
 	public function all_apps() {
 		$all_apps = [];
 
@@ -24,6 +43,12 @@ class Application extends Admin {
 		return $all_apps;
 	}
 
+	/**
+	 * get list of applications by given status and type
+	 * @param  boolean $enabled application status
+	 * @param  string  $type    rich/lib
+	 * @return array           
+	 */
 	public function apps($enabled = null, $type = null) {
 		if (empty($enabled) === false) {
 			$enabled = '1';
@@ -56,6 +81,12 @@ class Application extends Admin {
 		return $apps;
 	}
 
+	/**
+	 * set application status
+	 * @param  integer $app_id
+	 * @param  string  $enabled true/false
+	 * @return string
+	 */
 	public function update_enabled($app_id, $enabled) {
 		if ($enabled === 'true')
 			$enabled = '1';
@@ -67,6 +98,11 @@ class Application extends Admin {
 		return 'OK';
 	}
 
+	/**
+	 * load application setup library
+	 * @param  string $app_name
+	 * @return object/boolean
+	 */
 	private function app_setup($app_name) {
 		$app_file = $this->apps_path . DS . $app_name . DS . 'app.class.php';
 
@@ -85,6 +121,11 @@ class Application extends Admin {
 		return false;
 	}
 
+	/**
+	 * remove application
+	 * @param  integer $app_id
+	 * @return boolean
+	 */
 	public function uninstall_app($app_id) {
 		$result = $this->db->prepare('SELECT name, required_by FROM ' . DB_PRFX . 'apps WHERE id = ?');
 		$result->execute([$app_id]);
@@ -118,6 +159,11 @@ class Application extends Admin {
 		return true;
 	}
 
+	/**
+	 * install new application
+	 * @param  string $app_name
+	 * @return boolean
+	 */
 	public function install_app($app_name) {
 		global $admin;
 
@@ -170,6 +216,11 @@ class Application extends Admin {
 		return true;
 	}
 
+	/**
+	 * get application information
+	 * @param  string $app_name
+	 * @return array/boolean
+	 */
 	public function app_info($app_name) {
 		$info_file = PATH . DS . DS . 'apps' . DS . $app_name . DS . 'app.ini';
 
@@ -179,6 +230,11 @@ class Application extends Admin {
 		return false;
 	}
 
+	/**
+	 * load application files and prepare proper page by given page query parameter
+	 * @param  array $q page query parameter
+	 * @return array/boolean
+	 */
 	public function app_admin($q) {
 		$app_name = $q[0];
 		$app_method = isset($q[1]) ? $q[1] : '__default';

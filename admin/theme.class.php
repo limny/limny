@@ -1,12 +1,30 @@
 <?php
 
+
+/**
+ * Administration themes methods
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Theme {
+	// themes directory
 	public $themes_path;
 
+	/**
+	 * set themes directory property
+	 * @return void
+	 */
 	public function __construct() {
 		$this->themes_path = PATH . DS . 'themes';
 	}
 
+	/**
+	 * get list of themes
+	 * @return array
+	 */
 	public function themes() {
 		$themes = [];
 
@@ -17,6 +35,11 @@ class Theme {
 		return $themes;
 	}
 
+	/**
+	 * get theme information
+	 * @param  string        $theme_name
+	 * @return array/boolean
+	 */
 	public function theme_info($theme_name) {
 		$info_file = $this->themes_path . DS . $theme_name . DS . 'theme.ini';
 
@@ -26,6 +49,12 @@ class Theme {
 		return false;
 	}
 
+	/**
+	 * get theme editable files
+	 * @param  string        $theme_name
+	 * @param  string        $path
+	 * @return array/boolean
+	 */
 	public function theme_files($theme_name, $path = null) {
 		$theme_path = $this->themes_path . DS . $theme_name;
 

@@ -65,7 +65,7 @@ class Setup {
 	}
 
 	/**
-	 * delete application
+	 * delete application permissions
 	 * @param  string  $app application name
 	 * @return boolean
 	 */

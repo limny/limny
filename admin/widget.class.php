@@ -210,9 +210,7 @@ class Widget extends Form {
 				rmdir($widget_directory);
 			}
 
-			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'widgets WHERE id = ?')->execute([$widget_id]);
-
-			return true;
+			return $this->db->prepare('DELETE FROM ' . DB_PRFX . 'widgets WHERE id = ?')->execute([$widget_id]);
 		}
 
 		return false;

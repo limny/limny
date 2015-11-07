@@ -1,16 +1,36 @@
 <?php
 
+/**
+ * Administration widget methods
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Widget extends Form {
+	// widgets directory
 	public $widgets_path;
 
+	// database connection
 	private $db;
 
+	/**
+	 * set database connection property and widgets directory path
+	 * @param  object
+	 * @return void
+	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
 
 		$this->widgets_path = PATH . DS . 'widgets';
 	}
 	
+	/**
+	 * get single widget by id
+	 * @param  integer       $widget_id
+	 * @return array/boolean
+	 */
 	public function widget($widget_id = null) {
 		if (empty($widget_id))
 			return false;
@@ -24,6 +44,11 @@ class Widget extends Form {
 		return false;
 	}
 
+	/**
+	 * get widgets
+	 * @param  string $app all widgets or widgets of a specific application
+	 * @return array
+	 */
 	public function widgets($app = 'all') {
 		$widgets = [];
 		$is_all = $app === 'all' ? true : false;
@@ -42,6 +67,13 @@ class Widget extends Form {
 		return $widgets;
 	}
 
+	/**
+	 * set widget position
+	 * @param  integer $widget_id
+	 * @param  string  $position  new position
+	 * @param  integer $sort      order in position
+	 * @return boolean
+	 */
 	public function update_position($widget_id, $position, $sort) {
 		$this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET position = ? WHERE id = ?')->execute([$position, $widget_id]);
 
@@ -58,6 +90,11 @@ class Widget extends Form {
 		return true;
 	}
 
+	/**
+	 * make widget options elements
+	 * @param  integer        $widget_id
+	 * @return string/boolean            HTML elements in string result
+	 */
 	public function options_list($widget_id) {
 		$widget = $this->widget($widget_id);
 		
@@ -96,15 +133,26 @@ class Widget extends Form {
 		return false;
 	}
 
+	/**
+	 * set widget options
+	 * @param  integer $widget_id
+	 * @param  array   $options
+	 * @return boolean
+	 */
 	public function update_options($widget_id, $options) {
 		parse_str($options, $options);
 		$options = serialize($options);
 
 		return $this->db->prepare('UPDATE ' . DB_PRFX . 'widgets SET options = ? WHERE id = ?')->execute([$options, $widget_id]);
-
-		return $result;
 	}
 
+	/**
+	 * set widget visibility for given roles or languages
+	 * @param  integer $widget_id
+	 * @param  array   $roles     ids in array
+	 * @param  array   $langs     language codes in array
+	 * @return boolean
+	 */
 	public function update_visibility($widget_id, $roles = null, $langs = null) {
 		global $admin;
 
@@ -133,10 +181,20 @@ class Widget extends Form {
 		return false;
 	}
 
+	/**
+	 * install widget
+	 * @param  string  $widget_name
+	 * @return boolean
+	 */
 	public function install_widget($widget_name) {
 		return $this->db->prepare('INSERT INTO ' . DB_PRFX . 'widgets (app, method, position, roles, languages) VALUES (?, ?, ?, ?, ?)')->execute(['widget', $widget_name, 'none', 'all', 'all']);
 	}
 
+	/**
+	 * uninstall widget
+	 * @param  integer $widget_id [description]
+	 * @return boolean
+	 */
 	public function uninstall_widget($widget_id) {
 		if ($widget = $this->widget($widget_id)) {
 

@@ -1,12 +1,30 @@
 <?php
 
+/**
+ * Administration pages without file
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Page {
+	// database connection
 	private $db;
 
+	/**
+	 * set database connection property
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function Page($registry) {
 		$this->db = $registry->db;
 	}
 
+	/**
+	 * sign-in page and action
+	 * @return void
+	 */
 	public function page_signin() {
 		if (isset($_POST['limny_username']) && isset($_POST['limny_password'])) {
 			$username = $_POST['limny_username'];
@@ -65,6 +83,10 @@ class Page {
 		}
 	}
 
+	/**
+	 * sign-out action
+	 * @return void
+	 */
 	public function page_signout() {
 		if (admin_signed_in() === true) {
 			$this->db->prepare('UPDATE ' . DB_PRFX . 'users SET ip = NULL, hash = NULL WHERE id = ?')->execute([$_SESSION['limny']['admin']['id']]);

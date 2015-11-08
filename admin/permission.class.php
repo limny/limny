@@ -1,14 +1,34 @@
 <?php
 
+/**
+ * Administration get and check permissions
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Permission {
+	// database connection
 	private $db;
 	
+	// pages with no need to checking for permissions
+	private $exception = ['profile', 'profile/success', 'profile/notmatch', 'profile/error'];
+
+	/**
+	 * set database connection property
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function Permission($registry) {
 		$this->db = $registry->db;
 	}
 
-	private $exception = ['profile', 'profile/success', 'profile/notmatch', 'profile/error'];
-
+	/**
+	 * get permissions list
+	 * @param  integer $parent parent permission id
+	 * @return array
+	 */
 	public function permissions($parent = null) {
 		$result = $this->db->prepare('SELECT id, name, query FROM ' . DB_PRFX . 'permissions WHERE parent ' . (empty($parent) ? 'IS NULL OR parent < 1' : '= ?') . ' ORDER BY id ASC');
 		$result->execute(empty($parent) ? [] : [$parent]);
@@ -19,6 +39,11 @@ class Permission {
 		return isset($permissions) ? $permissions : [];
 	}
 
+	/**
+	 * check given page query parameter permission for current user
+	 * @param  array   $q page query parameter
+	 * @return boolean
+	 */
 	public function is_permitted($q) {
 		if (admin_signed_in() !== true)
 			return false;

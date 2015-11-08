@@ -47,9 +47,7 @@ class Permission {
 	public function is_permitted($q) {
 		if (admin_signed_in() !== true)
 			return false;
-
-		/*if (count($q) === 2 && is_numeric($q[1]))
-			unset($q[1]);*/
+		
 		if (count($q) > 1 && is_numeric(end($q)))
 			$q = array_slice($q, 0, -1);
 

@@ -1,20 +1,38 @@
 <?php
 
+/**
+ * Administration menu management
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Menu extends Manage {
+	// page title
 	public $manage_title = MENU;
+
+	// page icon
+	// font-awesome icon
 	public $manage_icon = 'fa-navicon';
 
+	// database items table
 	public $manage_table = 'menu';
 
+	// manage table heading row
 	public $manage_head = [
 		NAME => 'name',
 		STATUS => 'enabled',
 		ORDER => 'sort'
 	];
+
+	// number of items per page
 	public $manage_number = 999;
 
+	// default items orders
 	public $manage_order = ['sort' => 'ASC'];
 
+	// input form fields
 	public $manage_fields = [
 		'name' => [
 			'label' => NAME,
@@ -49,6 +67,12 @@ class Menu extends Manage {
 		],
 	];
 	
+	/**
+	 * call parent object construct
+	 * set extending methods for manage library
+	 * @param object $registry
+	 * @param array  $parameters
+	 */
 	public function Menu($registry, $parameters = []) {
 		parent::__construct($registry, $parameters);
 
@@ -57,6 +81,10 @@ class Menu extends Manage {
 		$this->manage_action->list->enabled = 'menu_status';
 	}
 
+	/**
+	 * get menu items list
+	 * @return array
+	 */
 	private function menu_items() {
 		$result = $this->db->query('SELECT id, sort FROM ' . DB_PRFX . 'menu ORDER BY sort ASC');
 		while ($menu = $result->fetch(PDO::FETCH_ASSOC))
@@ -65,6 +93,12 @@ class Menu extends Manage {
 		return isset($items) ? $items : [];
 	}
 
+	/**
+	 * add link to end of item title
+	 * @param  string $name
+	 * @param  array  $data
+	 * @return string
+	 */
 	public function menu_name($name, $data) {
 		if (empty($data['address']) === false)
 			$name .= ' <a href="' . $data['address'] . '" target="_blank"><i class="fa fa-location-arrow"></i></a>';
@@ -72,6 +106,11 @@ class Menu extends Manage {
 		return $name;
 	}
 
+	/**
+	 * menu status as coloured icon
+	 * @param  string $enabled
+	 * @return string
+	 */
 	public function menu_status($enabled) {
 		if (empty($enabled))
 			return '<i class="fa fa-times text-red"></i>';
@@ -79,6 +118,14 @@ class Menu extends Manage {
 		return '<i class="fa fa-check text-green"></i>';
 	}
 
+	/**
+	 * item sorting icons
+	 * @param  string  $order
+	 * @param  array   $data
+	 * @param  array   $files
+	 * @param  integer $id
+	 * @return string
+	 */
 	public function menu_sort($order, $data, $files, $id) {
 		$items = $this->menu_items();
 		$orders = array_keys($items);
@@ -97,6 +144,12 @@ class Menu extends Manage {
 		return implode(' ', $icons);
 	}
 
+	/**
+	 * update menu order
+	 * @param  integer $id
+	 * @param  string  $place up/down
+	 * @return boolean
+	 */
 	public function menu_sort_set($id, $place) {
 		if (in_array($place, ['up', 'down']) === false)
 			return false;

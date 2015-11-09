@@ -148,7 +148,7 @@ class Menu extends Manage {
 	 * update menu order
 	 * @param  integer $id
 	 * @param  string  $place up/down
-	 * @return boolean
+	 * @return void
 	 */
 	public function menu_sort_set($id, $place) {
 		if (in_array($place, ['up', 'down']) === false)
@@ -170,8 +170,6 @@ class Menu extends Manage {
 		$this->db->prepare('UPDATE ' . DB_PRFX . 'menu SET sort = ? WHERE id = ?')->execute([$new_order, $id]);
 
 		redirect(BASE . '/' . ADMIN_DIR . '/menu');
-
-		return true;
 	}
 }
 

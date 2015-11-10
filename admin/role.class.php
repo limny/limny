@@ -1,17 +1,34 @@
 <?php
 
+/**
+ * Administration roles management
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Role extends Manage {
+	// page title
 	public $manage_title = ROLES;
+
+	// page icon
+	// font-awesome icon
 	public $manage_icon = 'fa-users';
 
+	// items table
 	public $manage_table = 'roles';
 
+	// manage table heading row
 	public $manage_head = [NAME => 'name'];
 
+	// enable view items
 	public $manage_view = true;
 
+	// default items order
 	public $manage_order = ['id' => 'ASC'];
 
+	// input form fields
 	public $manage_fields = [
 		'name' => [
 			'label' => NAME,
@@ -23,12 +40,20 @@ class Role extends Manage {
 		]
 	];
 	
+	// form fields in view mode
 	public $manage_fields_view = [
 		'id' => ID,
 		'name' => NAME,
 		'permissions' => PERMISSIONS
 	];
 	
+	/**
+	 * call parent object construct
+	 * set extending methods for manage library
+	 * @param  object $registry
+	 * @param  array  $parameters
+	 * @return void
+	 */
 	public function Role($registry, $parameters = []) {
 		parent::__construct($registry, $parameters);
 
@@ -40,6 +65,14 @@ class Role extends Manage {
 		$this->manage_action->delete = 'do_not_delete_admin';
 	}
 
+	/**
+	 * permissions check boxes
+	 * @param  string  $permissions comma separated permission ids
+	 * @param  array   $data
+	 * @param  array   $files
+	 * @param  integer $id
+	 * @return string
+	 */
 	public function role_permissions_input($permissions, $data = [], $files = [], $id = null) {
 		global $admin;
 
@@ -69,6 +102,11 @@ class Role extends Manage {
 		return $data;
 	}
 
+	/**
+	 * check if first role id is in given array
+	 * @param  array   $ids
+	 * @return boolean
+	 */
 	public function do_not_delete_admin($ids = []) {
 		if (in_array('1', $ids))
 			return false;
@@ -76,6 +114,11 @@ class Role extends Manage {
 		return true;
 	}
 
+	/**
+	 * permissions view mode
+	 * @param  string $permissions
+	 * @return string
+	 */
 	public function role_permissions_view($permissions) {
 		$permissions = trim($permissions);
 		$permissions = explode(',', $permissions);
@@ -103,6 +146,14 @@ class Role extends Manage {
 		return $data;
 	}
 
+	/**
+	 * add number of role users to the end of role name
+	 * @param  string  $name
+	 * @param  array   $data
+	 * @param  array   $files
+	 * @param  integer $id
+	 * @return string
+	 */
 	public function role_name($name, $data = [], $files = [], $id = null) {
 		$result = $this->db->prepare('SELECT COUNT(*) AS count FROM ' . DB_PRFX . 'users WHERE FIND_IN_SET(?, roles) > 0');
 		$result->execute([$id]);
@@ -110,6 +161,12 @@ class Role extends Manage {
 		return $name . ' <span class="text-gray">(' . $result->fetchColumn() . ')</span>';
 	}
 
+	/**
+	 * get permission name by given item array
+	 * @param  array   $permission_item
+	 * @param  boolean $is_admin
+	 * @return string
+	 */
 	private function permission_name($permission_item, $is_admin) {
 		if ($is_admin === true)
 			return constant($permission_item['name']);
@@ -131,6 +188,11 @@ class Role extends Manage {
 		return $permission_item['name'];
 	}
 
+	/**
+	 * permission type by given id
+	 * @param  integer $permission_id
+	 * @return string
+	 */
 	private function permission_category($permission_id) {
 		if ($permission_id > 23)
 			return APP;

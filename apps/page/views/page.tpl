@@ -7,7 +7,7 @@
 	<p><?=$page['text']?></p>
 	<footer>
 		<?php if (empty($page['updated']) === false) { ?>
-		<span class="blog-post-lastupdate"><?=POST_LAST_UPDATE?>: <?=system_date($page['updated'])?></span>
+		<span class="blog-post-lastupdate"><?=PAGE_UPDATE_DATE?>: <?=system_date($page['updated'])?></span>
 		<?php } ?>
 	</footer>
 </article>

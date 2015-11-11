@@ -62,6 +62,7 @@ class PageAdminController extends Manage {
 		$this->manage_action->view->text = 'page_text';
 		$this->manage_action->view->time = 'system_date';
 		$this->manage_action->view->updated = 'system_date';
+		$this->manage_action->list->title = 'page_title';
 		$this->manage_action->list->time = 'system_date';
 		$this->manage_action->add->title = 'page_permalink_add';
 		$this->manage_action->edit->title = 'page_permalink_edit';
@@ -123,6 +124,14 @@ $(function(){
 		}
 
 		return true;
+	}
+
+	protected function page_title($title, $item) {
+		$permalink = load_lib('permalink');
+
+		$permalink_item = $permalink->permalink_by_query('page/' . $item['id']);
+
+		return $title . ' <a href="' . url($permalink_item['permalink']) . '" target="_blank"><i class="fa fa-location-arrow"></i></a>';
 	}
 }
 

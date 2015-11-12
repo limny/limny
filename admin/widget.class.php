@@ -96,39 +96,53 @@ class Widget extends Form {
 	 * @return string/boolean            HTML elements in string result
 	 */
 	public function options_list($widget_id) {
-		$widget = $this->widget($widget_id);
+		$data = $this->widget($widget_id);
 		
-		$app_path = PATH . DS . 'apps' . DS . $widget['app'] . DS;
-		
-		if (file_exists($app_path . 'widget.class.php') === false)
-			return 'Limny error: Application widget file not found.';
+		if ($data['app'] === 'widget') {
+			$widget_file = PATH . DS . 'widgets' . DS . $data['method'] . DS . $data['method'] . '.php';
 
-		require_once $app_path . 'widget.class.php';
-		$class_name = ucfirst($widget['app']) . 'Widget';
-		
-		if (class_exists($class_name)) {
-			$widget_class = new $class_name();
+			if (file_exists($widget_file)) {
+				$widget = new stdClass;
+				require_once $widget_file;
 
-			if (property_exists($class_name, $widget['method']) === false)
-				return 'Limny error: Application widget property not found.';
+				$widget_options = $widget->options;
+				$data['options'] = empty($data['options']) ? [] : unserialize($data['options']);
+			} else
+				return 'Limny error: Widget file not found.';
+		} else if ($data['app'] != 'limny') {
+			$app_path = PATH . DS . 'apps' . DS . $data['app'] . DS;
+			
+			if (file_exists($app_path . 'widget.class.php') === false)
+				return 'Limny error: Application widget file not found.';
 
-			$widget_options = $widget_class->{$widget['method']};
+			require_once $app_path . 'widget.class.php';
+			$class_name = ucfirst($data['app']) . 'Widget';
+			
+			if (class_exists($class_name)) {
+				$widget_class = new $class_name();
 
+				if (property_exists($class_name, $data['method']) === false)
+					return 'Limny error: Application widget property not found.';
+
+				$widget_options = $widget_class->{$data['method']};
+			} else
+				return 'Limny error: Application widget class not found.';
+		}
+
+		if (isset($widget_options)) {
 			$this->form_options = $widget_options;
-			$this->form_values = empty($widget['options']) ? [] : unserialize($widget['options']);
+			$this->form_values = is_array($data['options']) ? $data['options'] : unserialize($data['options']);
 
 			if ($form = $this->fields()) {
 				foreach ($form as $label => $element)
-					$data[] = '<label>' . $label . ':</label>' . $element;
+					$options[] = '<label>' . $label . ':</label>' . $element;
 
-				$data = implode('<hr>', $data);
-				$data = '<form>' . $data . '<button id="update-options" type="button" class="btn btn-primary">' . UPDATE . '</button><div style="clear:both;"></div></form>';
+				$options = implode('<hr>', $options);
+				$options = '<form>' . $options . '<button id="update-options" type="button" class="btn btn-primary">' . UPDATE . '</button><div style="clear:both;"></div></form>';
 
-				return $data;
+				return $options;
 			}
-
-		} else
-			return 'Limny error: Application widget class not found.';
+		}
 
 		return false;
 	}

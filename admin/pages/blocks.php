@@ -94,23 +94,31 @@ if (file_exists($theme_schema)) {
 
 			$options = '<a href="#" class="visibility-toggle" title="' . VISIBILITY . '"><i class="fa fa-flag fa-fw"></i></a><div class="visibility">' . $visibility . '</div>';
 
-			$widget_name = ucfirst($widget_name);
-			$widget_file = PATH . DS . 'apps' . DS . $widget['app'] . DS . 'widget.class.php';
+			$show_options = false;
 
-			if (file_exists($widget_file)) {
-				require_once $widget_file;
+			if ($widget['app'] == 'widget')
+				$show_options = true;
+			else if ($widget['app'] != 'limny') {
+				$widget_file = PATH . DS . 'apps' . DS . $widget['app'] . DS . 'widget.class.php';
 
-				$widget_class = ucfirst($widget['app']) . 'Widget';
+				if (file_exists($widget_file)) {
+					require_once $widget_file;
 
-				if (class_exists($widget_class)) {
-					$widget_object = new $widget_class();
+					$widget_class = ucfirst($widget['app']) . 'Widget';
 
-					if (property_exists($widget_object, $widget['method']))
-						$options = ' <a href="#" class="option-toggle"><i class="fa fa-gear fa-fw"></i></a> ' . $options . '<div class="options" data-empty="true"><div class="loading"></div></div>';
+					if (class_exists($widget_class)) {
+						$widget_object = new $widget_class();
+
+						if (property_exists($widget_object, $widget['method']))
+							$show_options = true;
+					}
 				}
 			}
 
-			$widget_item = '<li data-id="' . $widget['id'] . '"><span>' . $widget_name . '</span>' . $options . '</li>';
+			if ($show_options === true)
+				$options = ' <a href="#" class="option-toggle"><i class="fa fa-gear fa-fw"></i></a> ' . $options . '<div class="options" data-empty="true"><div class="loading"></div></div>';
+
+			$widget_item = '<li data-id="' . $widget['id'] . '"><span>' . ucfirst($widget_name) . '</span>' . $options . '</li>';
 
 			if (in_array($widget['position'], $theme_positions))
 				$widgets[$widget['position']][] = $widget_item;

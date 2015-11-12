@@ -96,9 +96,22 @@ if (file_exists($theme_schema)) {
 
 			$show_options = false;
 
-			if ($widget['app'] == 'widget')
-				$show_options = true;
-			else if ($widget['app'] != 'limny') {
+			if ($widget['app'] == 'widget') {
+				$widget_file = PATH . DS . 'widgets' . DS . $widget['method'] . DS . $widget['method'] . '.php';
+
+				if (file_exists($widget_file)) {
+					$item = $widget;
+					$widget = new stdClass;
+
+					require_once $widget_file;
+
+					if (isset($widget->options))
+						$show_options = true;
+
+					$widget = $item;
+					unset($item);
+				}
+			} else if ($widget['app'] != 'limny') {
 				$widget_file = PATH . DS . 'apps' . DS . $widget['app'] . DS . 'widget.class.php';
 
 				if (file_exists($widget_file)) {

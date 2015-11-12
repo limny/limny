@@ -96,42 +96,41 @@ class Widget extends Form {
 	 * @return string/boolean            HTML elements in string result
 	 */
 	public function options_list($widget_id) {
-		$data = $this->widget($widget_id);
+		$widget_item = $this->widget($widget_id);
 		
-		if ($data['app'] === 'widget') {
-			$widget_file = PATH . DS . 'widgets' . DS . $data['method'] . DS . $data['method'] . '.php';
+		if ($widget_item['app'] === 'widget') {
+			$widget_file = PATH . DS . 'widgets' . DS . $widget_item['method'] . DS . $widget_item['method'] . '.php';
 
 			if (file_exists($widget_file)) {
 				$widget = new stdClass;
 				require_once $widget_file;
 
 				$widget_options = $widget->options;
-				$data['options'] = empty($data['options']) ? [] : unserialize($data['options']);
 			} else
 				return 'Limny error: Widget file not found.';
-		} else if ($data['app'] != 'limny') {
-			$app_path = PATH . DS . 'apps' . DS . $data['app'] . DS;
+		} else if ($widget_item['app'] != 'limny') {
+			$app_path = PATH . DS . 'apps' . DS . $widget_item['app'] . DS;
 			
 			if (file_exists($app_path . 'widget.class.php') === false)
 				return 'Limny error: Application widget file not found.';
 
 			require_once $app_path . 'widget.class.php';
-			$class_name = ucfirst($data['app']) . 'Widget';
+			$class_name = ucfirst($widget_item['app']) . 'Widget';
 			
 			if (class_exists($class_name)) {
 				$widget_class = new $class_name();
 
-				if (property_exists($class_name, $data['method']) === false)
+				if (property_exists($class_name, $widget_item['method']) === false)
 					return 'Limny error: Application widget property not found.';
 
-				$widget_options = $widget_class->{$data['method']};
+				$widget_options = $widget_class->{$widget_item['method']};
 			} else
 				return 'Limny error: Application widget class not found.';
 		}
 
 		if (isset($widget_options)) {
 			$this->form_options = $widget_options;
-			$this->form_values = is_array($data['options']) ? $data['options'] : unserialize($data['options']);
+			$this->form_values = empty($widget_item['options']) ? [] : unserialize($widget_item['options']);
 
 			if ($form = $this->fields()) {
 				foreach ($form as $label => $element)

@@ -339,7 +339,7 @@ class Admin {
 	/**
 	 * is there any application installed with given page query parameter
 	 * @param  array   $q page query parameter
-	 * @return boolean    [description]
+	 * @return boolean
 	 */
 	public function is_app($q = []) {
 		if (count($q) < 1)

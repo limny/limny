@@ -192,7 +192,7 @@ class Widget extends Form {
 
 	/**
 	 * uninstall widget
-	 * @param  integer $widget_id [description]
+	 * @param  integer $widget_id
 	 * @return boolean
 	 */
 	public function uninstall_widget($widget_id) {

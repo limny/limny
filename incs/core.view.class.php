@@ -134,9 +134,12 @@ class CoreView {
 					} else if ($widget_item['app'] === 'widget') {
 						$widget_file = PATH . DS . 'widgets' . DS . $widget_item['method'] . DS . $widget_item['method'] . '.php';
 
-						if (file_exists($widget_file))
+						if (file_exists($widget_file)) {
 							include $widget_file;
-						else {
+
+							if (isset($widget->lifetime) && $widget->lifetime > 0)
+								$widget_item['lifetime'] = $widget->lifetime;
+						} else {
 							echo "Limny error: Widget method <em>{$widget_item['method']}</em> not found.";
 							continue;
 						}

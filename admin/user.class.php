@@ -243,9 +243,8 @@ class User extends Manage {
 		if (in_array('1', $ids))
 			return false;
 
-		foreach ($ids as $id) {
+		foreach ($ids as $id)
 			$this->db->prepare('DELETE FROM ' . DB_PRFX . 'profiles WHERE user = ?')->execute([$id]);
-		}
 
 		return true;
 	}
@@ -253,11 +252,12 @@ class User extends Manage {
 	/**
 	 * check user account is enable or disable
 	 * @param  string  $enabled
-	 * @param  array   $post
+	 * @param  array   $data
+	 * @param  array   $files
 	 * @param  integer $id
 	 * @return string
 	 */
-	public function user_enabled($enabled, $post = [], $id = null) {
+	public function user_enabled($enabled, $data = [], $files = [], $id = null) {
 		if ($id == '1')
 			return '1';
 
@@ -267,12 +267,12 @@ class User extends Manage {
 	/**
 	 * add user profile record
 	 * @param  string $value
-	 * @param  array  $post
+	 * @param  array  $data
 	 * @param  array  $files
 	 * @param  integer $id
 	 * @return boolean
 	 */
-	protected function add_profile($value = null, $post = [], $files = [], $id = null) {
+	protected function add_profile($value = null, $data = [], $files = [], $id = null) {
 		if (empty($id))
 			return false;
 

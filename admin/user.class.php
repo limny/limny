@@ -1,28 +1,49 @@
 <?php
 
+/**
+ * Administration user management
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class User extends Manage {
+	// page title
 	public $manage_title = USERS;
+
+	// page icon
+	// font-awesome icon
 	public $manage_icon = 'fa-user';
 
+	// database items table
 	public $manage_table = 'users';
 
-	// LIST
+	// manage table heading row
 	public $manage_head = [
 		USERNAME => 'username',
 		EMAIL => 'email',
 		STATUS => 'enabled'
 	];
+
+	// number of items per page
 	public $manage_number = 10;
+
+	// enable view item
 	public $manage_view = true;
 
-	// SEARCH
+	// enable search in items
+	// search in two columns
 	public $manage_search = ['username', 'email'];
 
-	// SORTING
+	// enable sorting columns
+	// sortable columns in table
 	public $manage_sort = ['username', 'email'];
+
+	// default items orders
 	public $manage_order = ['id' => 'ASC'];
 
-	// ADD & EDIT
+	// input form fields
 	public $manage_fields = [
 		'username' => [
 			'label' => USERNAME,
@@ -50,6 +71,7 @@ class User extends Manage {
 		],
 	];
 
+	// fields int view mode
 	public $manage_fields_view = [
 		'id' => ID,
 		'username' => USERNAME,
@@ -61,6 +83,12 @@ class User extends Manage {
 		'last_activity' => LAST_ACTIVITY
 	];
 	
+	/**
+	 * call parent object construct
+	 * set extending methods for manage library
+	 * @param object $registry
+	 * @param array  $parameters
+	 */
 	public function User($registry, $parameters = []) {
 		parent::__construct($registry, $parameters);
 
@@ -90,6 +118,12 @@ class User extends Manage {
 		$this->manage_action->view->enabled = 'user_status';
 	}
 
+	/**
+	 * menu status as coloured icon
+	 * @param  string $enabled
+	 * @param  array  $data
+	 * @return string
+	 */
 	public function user_status($enabled, $data = []) {
 		if (empty($enabled))
 			return '<i class="fa fa-times text-red"></i>';
@@ -97,6 +131,14 @@ class User extends Manage {
 		return '<i class="fa fa-check text-green"></i>';
 	}
 
+	/**
+	 * check username length, availability and used characters
+	 * @param  string         $username
+	 * @param  array          $data
+	 * @param  array          $files
+	 * @param  integer        $id
+	 * @return string/boolean
+	 */
 	public function username_check($username, $data = [], $files = [], $id = null) {
 		if (strlen($username) < 3)
 			return SENTENCE_22;
@@ -122,6 +164,11 @@ class User extends Manage {
 		return true;
 	}
 
+	/**
+	 * check password length
+	 * @param  string         $password
+	 * @return string/boolean
+	 */
 	public function password_check($password) {
 		if (empty($password) || strlen($password) < 6)
 			return SENTENCE_24;
@@ -129,6 +176,12 @@ class User extends Manage {
 		return true;
 	}
 
+	/**
+	 * check password in edit mode
+	 * in edit mode password can be empty
+	 * @param  string         $password
+	 * @return string/boolean
+	 */
 	public function password_check_edit($password) {
 		if (empty($password) === false && strlen($password) < 6)
 			return SENTENCE_24;
@@ -136,6 +189,11 @@ class User extends Manage {
 		return true;
 	}
 
+	/**
+	 * create password hash with given string
+	 * @param  string         $password
+	 * @return boolean/string
+	 */
 	public function hash_password($password) {
 		if (empty($password))
 			return false;
@@ -146,6 +204,14 @@ class User extends Manage {
 		return $password_hash->HashPassword($password);
 	}
 
+	/**
+	 * check email address
+	 * @param  string         $email
+	 * @param  array          $data
+	 * @param  array          $files
+	 * @param  integer        $id
+	 * @return string/boolean
+	 */
 	public function email_check($email, $data = [], $files = [], $id = null) {
 		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false)
 			return SENTENCE_26;
@@ -167,6 +233,12 @@ class User extends Manage {
 		return true;
 	}
 
+	/**
+	 * delete user
+	 * do not delete user number one, that's administrator
+	 * @param  array   $ids
+	 * @return boolean
+	 */
 	public function user_delete($ids) {
 		if (in_array('1', $ids))
 			return false;
@@ -178,6 +250,13 @@ class User extends Manage {
 		return true;
 	}
 
+	/**
+	 * check user account is enable or disable
+	 * @param  string  $enabled
+	 * @param  array   $post
+	 * @param  integer $id
+	 * @return string
+	 */
 	public function user_enabled($enabled, $post = [], $id = null) {
 		if ($id == '1')
 			return '1';
@@ -185,6 +264,14 @@ class User extends Manage {
 		return $enabled;
 	}
 
+	/**
+	 * add user profile record
+	 * @param  string $value
+	 * @param  array  $post
+	 * @param  array  $files
+	 * @param  integer $id
+	 * @return boolean
+	 */
 	protected function add_profile($value = null, $post = [], $files = [], $id = null) {
 		if (empty($id))
 			return false;

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Administration themes methods
  *

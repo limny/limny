@@ -15,6 +15,9 @@ class Widget extends Form {
 	// database connection
 	private $db;
 
+	// registry
+	private $registry;
+
 	/**
 	 * set database connection property and widgets directory path
 	 * @param  object
@@ -22,6 +25,7 @@ class Widget extends Form {
 	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
+		$this->registry = $registry;
 
 		$this->widgets_path = PATH . DS . 'widgets';
 	}
@@ -96,6 +100,8 @@ class Widget extends Form {
 	 * @return string/boolean            HTML elements in string result
 	 */
 	public function options_list($widget_id) {
+		$registry = $this->registry;
+		
 		$widget_item = $this->widget($widget_id);
 		
 		if ($widget_item['app'] === 'widget') {

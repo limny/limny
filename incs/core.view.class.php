@@ -90,6 +90,8 @@ class CoreView {
 	 * @return boolean
 	 */
 	public function __get($widgets_position) {
+		$registry = $this->registry;
+		
 		if ($widgets = $this->widget_lib->widgets($widgets_position)) {
 			foreach ($widgets as $widget_item) {
 				$widget = (object) [];

@@ -1,42 +1,88 @@
 <?php
 
+/**
+ * Database records management
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Manage extends Admin {
-	// GLOBAL VARIABLES
-	public $manage_q = []; // slash (/) exploded string
-	public $manage_table = null; // database table
-	public $manage_id_col = 'id'; // id column used in edit
-	public $manage_action = null; // input, list, add, edit, delete
+	// page query parameter
+	public $manage_q = [];
+
+	// database items table
+	public $manage_table = null;
+
+	// database ID column
+	public $manage_id_col = 'id';
+
+	// extended function or methods for input, list, add, edit and delete modes
+	public $manage_action = null;
 	
-	// EDIT VARIABLES
+	// input mode fields array
 	public $manage_fields = [];
 
-	// LISTS METHOD PROPERTIES
+	// base URL
 	public $manage_base = null;
 	
-	public $manage_add = true; // controls add button and page
-	public $manage_deletes = true; // controls delete selected action
-	public $manage_edit = true; // controls edit button and page
-	public $manage_view = false; // controls view button and page
-	public $manage_delete = true; // controls delete button and page
-	public $manage_head = []; // table head
-	public $manage_query = null; // database query
-	public $manage_order = []; // query order
-	public $manage_number = 15; // items limit per page
+	// add button visibility
+	public $manage_add = true;
 
-	// SORTING
-	public $manage_sort = false; // array of columns to sorting
+	// delete selected button visibility
+	public $manage_deletes = true;
 
-	// SEARCH
-	public $manage_search = false; // array of columns to search
+	// edit button visibility
+	public $manage_edit = true;
 
+	// view button visibility
+	public $manage_view = false;
+
+	// delete button visibility
+	public $manage_delete = true;
+
+	// table heading items
+	public $manage_head = [];
+
+	// database query for selecting items
+	public $manage_query = null;
+
+	// items order
+	public $manage_order = [];
+
+	// number of items per page
+	public $manage_number = 15;
+
+	// array of sortable columns
+	public $manage_sort = false;
+
+	// array of columns to search
+	public $manage_search = false;
+
+	// page icon
 	public $manage_icon = false;
-	public $manage_upload_path = false; // upload path
-	public $manage_upload_base = false; // upload path
+
+	// upload path
+	public $manage_upload_path = false;
+
+	// upload base URL
+	public $manage_upload_base = false;
+
+	// delete uploaded file
 	public $manage_delete_file = true;
 
-	// PRIVATE PROPERTIES
+	// allowed image extensions for upload
 	private $manage_image_exts = ['png', 'gif', 'jpg', 'jpeg'];
 
+	/**
+	 * call parent constructor
+	 * set manage actions
+	 * load library language
+	 * set page query parameter
+	 * @param array $registry
+	 * @param array $parameters
+	 */
 	public function __construct($registry = [], $parameters = []) {
 		parent::__construct($registry);
 
@@ -52,6 +98,10 @@ class Manage extends Admin {
 			$this->manage_q = $parameters['q'];
 	}
 
+	/**
+	 * show manage page based on URL
+	 * @return string
+	 */
 	public function manage() {
 		if (end($this->manage_q) === 'add' || end($this->manage_q) === 'delete' || end($this->manage_q) === 'search')
 			$this->manage_base = array_slice($this->manage_q, 0, -1);
@@ -119,6 +169,10 @@ class Manage extends Admin {
 		return $data;
 	}
 
+	/**
+	 * items list table
+	 * @return string
+	 */
 	public function list_table() {
 		$data = '';
 		
@@ -325,6 +379,13 @@ class Manage extends Admin {
 		return $data;
 	}
 
+	/**
+	 * input form for add and edit modes
+	 * @param  array   $post  post data
+	 * @param  array   $files post files
+	 * @param  integer $id    item id
+	 * @return string
+	 */
 	public function input_form($post = [], $files = [], $id = null) {
 		if (isset($post) && count($post) > 0) {
 			foreach ($this->manage_fields as $column => $options)
@@ -443,6 +504,13 @@ class Manage extends Admin {
 		return false;
 	}
 
+	/**
+	 * database records to array
+	 * @param  string $table
+	 * @param  string $id_column
+	 * @param  string $title_column
+	 * @return array
+	 */
 	protected function table_to_array($table, $id_column, $title_column) {
 		$table = str_replace(['\'', '"'], '', $table);
 
@@ -455,6 +523,12 @@ class Manage extends Admin {
 		return isset($items) ? $items : false;
 	}
 
+	/**
+	 * add item to database and upload file if exists
+	 * @param  array $post
+	 * @param  array $files
+	 * @return boolean
+	 */
 	private function add($post = [], $files = []) {
 		if (isset($this->manage_action->add_value))
 			foreach ((array) $this->manage_action->add_value as $column => $value) {
@@ -498,6 +572,13 @@ class Manage extends Admin {
 		return false;
 	}
 
+	/**
+	 * update existing database item
+	 * @param  array   $post
+	 * @param  array   $files
+	 * @param  integer $id
+	 * @return boolean
+	 */
 	private function edit($post, $files, $id) {
 		if (isset($this->manage_action->edit_value))
 			foreach ((array) $this->manage_action->edit_value as $column => $value) {
@@ -557,6 +638,12 @@ class Manage extends Admin {
 		return false;
 	}
 
+	/**
+	 * delete item and uploaded file if exists
+	 * @param  array  $ids
+	 * @param  array  $post
+	 * @return string
+	 */
 	private function delete($ids = [], $post = []) {
 		if (is_array($ids) === false || count($ids) < 1)
 			redirect($this->manage_base);
@@ -614,6 +701,11 @@ class Manage extends Admin {
 		return $data;
 	}
 
+	/**
+	 * page navigation
+	 * @param  array  $items
+	 * @return string
+	 */
 	protected function nav($items = []) {
 		if (is_array($items) === false || count($items) < 1)
 			return false;
@@ -645,6 +737,12 @@ class Manage extends Admin {
 		return $data;
 	}
 
+	/**
+	 * set search query statement to session
+	 * @param  string $query
+	 * @param  array  $post
+	 * @return boolean
+	 */
 	private function search($query, $post = []) {
 		if (is_array($this->manage_search) === false || count($this->manage_search) < 1)
 			return false;
@@ -671,6 +769,12 @@ class Manage extends Admin {
 		return true;
 	}
 
+	/**
+	 * set column sorting to session
+	 * @param  string $column
+	 * @param  string $order
+	 * @return boolean
+	 */
 	private function sort($column, $order = 'asc') {
 		$order = strtolower($order);
 
@@ -690,6 +794,11 @@ class Manage extends Admin {
 		return true;
 	}
 
+	/**
+	 * item in view mode
+	 * @param  integer $id
+	 * @return string/boolean
+	 */
 	public function view($id = null) {
 		if (count($this->manage_fields) > 0) {
 			$data = $this->nav([
@@ -748,6 +857,16 @@ class Manage extends Admin {
 		return false;
 	}
 
+	/**
+	 * call action function or method
+	 * @param  string  $action         action type
+	 * @param  string  $column
+	 * @param  array   $post
+	 * @param  array   $files
+	 * @param  integer $id
+	 * @param  *       $optional_value
+	 * @return string
+	 */
 	private function call_action($action, $column, $post = [], $files = [], $id = null, $optional_value = null) {
 		if (isset($post[$column]))
 			$data[$column] = $post[$column];
@@ -767,6 +886,11 @@ class Manage extends Admin {
 		return $data[$column];
 	}
 
+	/**
+	 * upload file
+	 * @param  array          $file
+	 * @return stirng/boolean
+	 */
 	private function file_upload($file) {
 		if ($this->manage_upload_path === false || file_exists($this->manage_upload_path) === false || is_dir($this->manage_upload_path) === false)
 			return false;
@@ -798,6 +922,13 @@ class Manage extends Admin {
 		return false;
 	}
 
+	/**
+	 * get item by id
+	 * @param  integer              $id
+	 * @param  string               $column
+	 * @param  string               $table
+	 * @return array/string/boolean
+	 */
 	protected function get_item($id, $column = null, $table = null) {
 		if (empty($table))
 			$table = $this->manage_table;

@@ -2,7 +2,7 @@
 
 // set PHP errors reporting
 // these type of errors cannot be handled with Limny error handler function
-error_reporting(E_ALL);//E_ERROR | E_PARSE | E_STRICT);
+error_reporting(E_ERROR | E_PARSE | E_STRICT);
 
 // set session name & start session
 session_name('limny');

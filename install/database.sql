@@ -67,7 +67,7 @@ INSERT INTO `lmn_config` (`name`, `value`) VALUES
 ('motto', 'another site with limny...'),
 ('description', 'limny content management system'),
 ('header', 'Limny'),
-('footer', 'Copyright &copy; 2015'),
+('footer', 'Copyright &copy;'),
 ('theme', 'blog'),
 ('cache_lifetime', '60'),
 ('default_content', 'app'),

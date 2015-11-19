@@ -208,12 +208,15 @@ hr {
 				break;
 
 			case 'update':
+				date_default_timezone_set('UTC');
+
 				$title = $_POST['title'];
 				$address = $_POST['address'];
 				$admin_username = $_POST['admin_username'];
 				$admin_password = $_POST['admin_password'];
 				$admin_email = $_POST['admin_email'];
 
+				$footer = 'Copyright &copy ' . date('Y');
 				$url_mode = function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()) ? 'standard' : 'simple';
 
 				require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'incs' . DIRECTORY_SEPARATOR . 'passwordhash.class.php';
@@ -226,7 +229,7 @@ hr {
 				$db = new PDO('mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
 				$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-				foreach (['title', 'address', 'url_mode'] as $name)
+				foreach (['title', 'address', 'footer', 'url_mode'] as $name)
 					$db->prepare('UPDATE ' . DB_PRFX . 'config SET value = ? WHERE name = ?')->execute([${$name}, $name]);
 
 				foreach (['username', 'password', 'email'] as $name)

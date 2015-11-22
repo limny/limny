@@ -53,22 +53,24 @@ class PostModel {
 			return $count['count'];
 		}
 
+		$db_query = 'SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1 ';
+
 		if (empty($cat_id) === false) {
 			$values[] = $cat_id;
-			$category_statement = ' AND FIND_IN_SET(?, category) > 0';
+			$db_query .= ' AND FIND_IN_SET(?, category) > 0';
 		}
 
 		if (empty($tag) === false) {
 			$values[] = $tag;
-			$tag_statement = ' AND FIND_IN_SET(?, tags) > 0';
+			$db_query .= ' AND FIND_IN_SET(?, tags) > 0';
 		}
 		
 		if (empty($user_id) === false) {
 			$values[] = $user_id;
-			$tag_statement = ' AND user = ?';
+			$db_query .= ' AND user = ?';
 		}
-		
-		$result = self::$db->prepare('SELECT COUNT(id) AS count FROM ' . DB_PRFX . 'posts WHERE published = 1 ' . @$category_statement . @$tag_statement);
+
+		$result = self::$db->prepare($db_query);
 		$result->execute($values);
 
 		$count = $result->fetch(PDO::FETCH_ASSOC);

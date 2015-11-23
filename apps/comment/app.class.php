@@ -1,10 +1,26 @@
 <?php
 
+/**
+ * Comment application model
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class CommentApp {
+	// database connection
 	private $db;
 
+	// setup library
 	private $setup;
 
+	/**
+	 * set database connection
+	 * load setup library and set as a property
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
 
@@ -13,6 +29,10 @@ class CommentApp {
 		$this->setup = $setup;
 	}
 
+	/**
+	 * application install
+	 * @return boolean
+	 */
 	public function install() {
 		// create comments table
 		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'comments (
@@ -55,6 +75,10 @@ class CommentApp {
 		return true;
 	}
 
+	/**
+	 * application uninstall
+	 * @return boolean
+	 */
 	public function uninstall() {
 		// drop comments table
 		$this->db->exec('DROP TABLE ' . DB_PRFX . 'comments');

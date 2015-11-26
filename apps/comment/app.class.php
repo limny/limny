@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Comment application model
+ * Comment application
  *
  * @package Limny
  * @author Hamid Samak <hamid@limny.org>

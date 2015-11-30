@@ -1,8 +1,23 @@
 <?php
 
+/**
+ * Comment main class
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class Comment {
+	// CSS link tag
 	public $head;
 
+	/**
+	 * set head tag
+	 * set database connection in model
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function __construct($registry) {
 		$this->head = load_css('comment', 'style.css');
 
@@ -11,6 +26,12 @@ class Comment {
 		CommentModel::$db = $registry->db;
 	}
 
+	/**
+	 * load comments and form
+	 * @param  integer $post
+	 * @param  integer $replyto
+	 * @return string
+	 */
 	public function comment($post, $replyto = null) {
 		$data = $this->comments($post['id']);
 		$data .= $this->form($post, (isset($_GET['replyto']) ? $_GET['replyto'] : null));
@@ -18,6 +39,12 @@ class Comment {
 		return load_view('comment', 'container.tpl', ['comments' => $data]);
 	}
 
+	/**
+	 * comment submission form
+	 * @param  integer $post
+	 * @param  integer $replyto
+	 * @return string
+	 */
 	private function form($post, $replyto = null) {
 		$vars = ['post' => $post];
 
@@ -59,6 +86,14 @@ class Comment {
 		return load_view('comment', 'form.tpl', $vars);
 	}
 
+	/**
+	 * check entry parameters and return result and proper message
+	 * @param  string $name
+	 * @param  string $email
+	 * @param  string $website
+	 * @param  string $comment
+	 * @return array
+	 */
 	private function check($name, $email, $website, $comment) {
 		if (empty($name) || empty($email) || empty($comment))
 			return [false, COMMENT_SENTENCE_2];
@@ -71,6 +106,12 @@ class Comment {
 		return [true, true];
 	}
 
+	/**
+	 * load comments by post
+	 * @param  integer        $post_id
+	 * @param  integer        $parent
+	 * @return string/boolean
+	 */
 	private function comments($post_id, $parent = null) {
 		$comments = CommentModel::comments($post_id, $parent);
 		
@@ -102,6 +143,12 @@ class Comment {
 		return false;
 	}
 
+	/**
+	 * make reply URL
+	 * @param  array  $comment
+	 * @param  string $current_page
+	 * @return string
+	 */
 	private function reply_url($comment, $current_page) {
 		foreach (['&', '?'] as $char)
 			if (($position = strpos($current_page, $char . 'replyto=')) !== false) {

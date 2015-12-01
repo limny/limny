@@ -849,6 +849,9 @@ class Manage extends Admin {
 						</div>
 					</form>';
 
+					if (isset($this->manage_action->view->function))
+						$this->call_action('view', 'function', [], [], $id);
+
 					return $data;
 				}
 			}

@@ -844,7 +844,10 @@ class Manage extends Admin {
 					$data .= '<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">';
 					
-					$data .= '<a href="' . $this->manage_base . '/edit/' . $id . '" class="btn btn-primary btn-sm btn-manage">' . EDIT . '</a><a href="' . $this->manage_base . '/delete/' . $id . '" class="btn btn-danger btn-sm btn-manage">' . DELETE . '</a><a href="' . $this->manage_base . '/' . @$_SESSION['_manage_page'][$this->manage_table] . '" class="btn btn-default btn-sm btn-manage">' . BACK . '</a>
+					if ($this->manage_edit === true)
+						$data .= '<a href="' . $this->manage_base . '/edit/' . $id . '" class="btn btn-primary btn-sm btn-manage">' . EDIT . '</a>';
+					
+					$data .= '<a href="' . $this->manage_base . '/delete/' . $id . '" class="btn btn-danger btn-sm btn-manage">' . DELETE . '</a><a href="' . $this->manage_base . '/' . @$_SESSION['_manage_page'][$this->manage_table] . '" class="btn btn-default btn-sm btn-manage">' . BACK . '</a>
 							</div>
 						</div>
 					</form>';

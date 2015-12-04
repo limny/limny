@@ -126,7 +126,7 @@ class Manage extends Admin {
 
 		if (end($this->manage_q) === 'add')
 			$data = $this->input_form($post, $files);
-		else if (isset($second_level) && $second_level === 'edit') {
+		else if (isset($second_level) && $second_level === 'edit' && $this->manage_edit === true) {
 			$id = end($this->manage_q);
 
 			$data = $this->input_form($post, $files, $id);

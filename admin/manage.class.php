@@ -150,7 +150,7 @@ class Manage extends Admin {
 			$order = end($this->manage_q);
 
 			$data = $this->sort($column, $order);
-		}else if (end($this->manage_q) === 'search' && $this->manage_search !== false)
+		}else if (end($this->manage_q) === 'search' && $this->manage_search !== false && isset($post['search']))
 			$data = $this->search($post['search'], $post);
 		else {
 			$page = ceil(end($this->manage_q));

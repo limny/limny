@@ -134,7 +134,7 @@ class Manage extends Admin {
 			$id = end($this->manage_q);
 
 			$data = $this->view($id);
-		} else if (end($this->manage_q) === 'delete' || (isset($second_level) && $second_level === 'delete')) {
+		} else if ((end($this->manage_q) === 'delete' || (isset($second_level) && $second_level === 'delete')) && ($this->manage_delete === true || $this->manage_deletes === true)) {
 			$id = end($this->manage_q);
 
 			if (is_numeric($id))

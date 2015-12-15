@@ -141,6 +141,8 @@ class CoreView {
 
 							if (isset($widget->lifetime) && $widget->lifetime > 0)
 								$widget_item['lifetime'] = $widget->lifetime;
+							else
+								$widget_item['lifetime'] = 0;
 						} else {
 							echo "Limny error: Widget method <em>{$widget_item['method']}</em> not found.";
 							continue;
@@ -164,6 +166,8 @@ class CoreView {
 
 							if (isset($widget_class->lifetime) && $widget_class->lifetime > 0)
 								$widget_item['lifetime'] = $widget_class->lifetime;
+							else
+								$widget_item['lifetime'] = 0;
 						} else {
 							echo "Limny error: Application widget class <em>{$class_name}</em> not found.";
 							continue;

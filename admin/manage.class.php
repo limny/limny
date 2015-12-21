@@ -541,6 +541,9 @@ class Manage extends Admin {
 				if (isset($options['type']) && $options['type'] == 'file' && $file_upload = $this->file_upload($files[$column]))
 					$post[$column] = $file_upload;
 
+				if (isset($post[$column]) === false)
+					continue;
+
 				if (isset($this->manage_action->add->{$column})) {
 					$post[$column] = $this->call_action('add', $column, $post, $files);
 					

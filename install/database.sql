@@ -26,7 +26,7 @@ CREATE TABLE `lmn_apps` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `lmn_apps` (`id`, `name`, `enabled`, `required_by`) VALUES
-(1, 'post', 1, 'comment'),
+(1, 'post', 1, 'comment,feed'),
 (2, 'page', 1, NULL),
 (3, 'gallery', 1, NULL),
 (4, 'comment', 1, NULL),

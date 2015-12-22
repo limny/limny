@@ -1,0 +1,1 @@
+			<category><![CDATA[<?=$name?>]]></category>

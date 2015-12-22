@@ -30,7 +30,8 @@ INSERT INTO `lmn_apps` (`id`, `name`, `enabled`, `required_by`) VALUES
 (2, 'page', 1, NULL),
 (3, 'gallery', 1, NULL),
 (4, 'comment', 1, NULL),
-(5, 'ckeditor', 1, NULL);
+(5, 'ckeditor', 1, NULL),
+(6, 'feed', 1, NULL);
 
 DROP TABLE IF EXISTS `lmn_codes`;
 CREATE TABLE `lmn_codes` (
@@ -342,7 +343,7 @@ ALTER TABLE `lmn_adminnav`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 ALTER TABLE `lmn_apps`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 ALTER TABLE `lmn_codes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

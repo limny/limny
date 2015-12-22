@@ -672,9 +672,12 @@ class Manage extends Admin {
 
 			foreach ($ids as $id) {
 				if (isset($file_columns) && $item = $this->get_item($id))
-					foreach ($file_columns as $file_column)
-						if (file_exists($this->manage_upload_path . DS . $item[$file_column]))
-							unlink($this->manage_upload_path . DS . $item[$file_column]);
+					foreach ($file_columns as $file_column) {
+						$file_path = $this->manage_upload_path . DS . $item[$file_column];
+
+						if (file_exists($file_path) && is_file($file_path))
+							unlink($file_path);
+					}
 
 				$this->db->prepare('DELETE FROM ' . DB_PRFX . $table . ' WHERE ' . $id_column . ' = ?')->execute([$id]);
 			}

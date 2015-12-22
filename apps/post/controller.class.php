@@ -9,11 +9,20 @@ class PostController {
 	public $content;
 
 	private $registry;
+	private $application;
 
 	public function PostController($registry) {
 		$this->registry = $registry;
 		
 		PostModel::$db = $registry->db;
+
+		$this->application = load_lib('application');
+
+		if ($this->application->app_installed('feed') && $this->application->app_enabled('feed')) {
+			$this->application->load_language('feed');
+
+			$this->head .= '<link rel="alternate" type="application/rss+xml" title="' . $registry->config->title . ' &raquo; ' . FEED_FEED . '" href="' . url('feed', true) . '">' . "\n";
+		}
 	}
 
 	public function __global() {
@@ -72,10 +81,8 @@ class PostController {
 			$this->title = $post['title'];
 			$this->content = load_view('post', 'post.tpl', ['post' => $post, 'category' => $category, 'tags' => $tags]);
 
-			$application = load_lib('application');
-
-			if ($application->app_installed('comment') && $application->app_enabled('comment')) {
-				$application->load_language('comment');
+			if ($this->application->app_installed('comment') && $this->application->app_enabled('comment')) {
+				$this->application->load_language('comment');
 
 				require_once PATH . DS . 'apps' . DS . 'comment' . DS . 'comment.class.php';
 				$comment = new Comment($this->registry);

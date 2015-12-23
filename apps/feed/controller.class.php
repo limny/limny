@@ -34,6 +34,11 @@ class FeedController {
 					if ($cat = PostModel::cat_by_id($cat_id))
 						$categories .= load_view('feed', 'category.tpl', ['name' => $cat['name']]) . "\n";
 
+			if (function_exists('mb_substr'))
+				$post_text = mb_substr($post['text'], 0, 250, 'UTF-8');
+			else
+				$post_text = substr($post['text'], 0, 250);
+
 			$params = [
 				'post_title' => $post['title'],
 				'post_url' => $this->post_permalink($post['id']),
@@ -41,7 +46,8 @@ class FeedController {
 				'post_author' => $post['username'],
 				'post_category' => $categories,
 				'post_url_by_id' => url('post/' . $post['id'], true),
-				'post_text' => strip_tags($post['text'], '<p><br><img>')
+				'post_text' => strip_tags($post_text),
+				'post_text_encoded' => strip_tags($post['text'], '<p><br><img>')
 			];
 
 			$items .= load_view('feed', 'item.tpl', $params) . "\n";

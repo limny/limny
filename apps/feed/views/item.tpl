@@ -6,5 +6,6 @@
 				<dc:creator><![CDATA[<?=$post_author?>]]></dc:creator>
 	<?=$post_category?>
 				<guid isPermaLink="false"><?=$post_url_by_id?></guid>
-				<content:encoded><![CDATA[<?=$post_text?>]]></content:encoded>
+				<description><![CDATA[<?=$post_text?>]]></description>
+				<content:encoded><![CDATA[<?=$post_text_encoded?>]]></content:encoded>
 		</item>

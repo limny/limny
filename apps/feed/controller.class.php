@@ -41,7 +41,7 @@ class FeedController {
 				'post_author' => $post['username'],
 				'post_category' => $categories,
 				'post_url_by_id' => url('post/' . $post['id'], true),
-				'post_text' => strip_tags($post['text'], '<p><br>')
+				'post_text' => strip_tags($post['text'], '<p><br><img>')
 			];
 
 			$items .= load_view('feed', 'item.tpl', $params) . "\n";

@@ -1,15 +1,38 @@
 <?php
 
+/**
+ * Feed controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class FeedController {
+	// page query parameter
 	public $q;
+
+	// page cache
 	public $cache;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	// config values
 	private $config;
 
+	/**
+	 * get and set config values
+	 * set database connection to Post model
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function FeedController($registry) {
 		$this->config = $registry->config;
 
@@ -17,6 +40,10 @@ class FeedController {
 		PostModel::$db = $registry->db;
 	}
 
+	/**
+	 * feed page
+	 * @return void
+	 */
 	public function __global() {
 		if (isset($this->q['param']) && count($this->q['param']) > 1)
 			redirect(url('feed'));
@@ -70,6 +97,11 @@ class FeedController {
 		exit;
 	}
 
+	/**
+	 * get post permalink by post id
+	 * @param  integer $post_id number of post record
+	 * @return string
+	 */
 	private function post_permalink($post_id) {
 		$permalink = load_lib('permalink');
 

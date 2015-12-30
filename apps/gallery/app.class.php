@@ -1,10 +1,25 @@
 <?php
 
+/**
+ * Gallery application
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class GalleryApp {
+	// database connection
 	private $db;
 
+	// setup library
 	private $setup;
 
+	/**
+	 * set database connection
+	 * load and set setup library
+	 * @param [type] $registry [description]
+	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
 
@@ -13,6 +28,10 @@ class GalleryApp {
 		$this->setup = $setup;
 	}
 
+	/**
+	 * application install
+	 * @return boolean
+	 */
 	public function install() {
 		// create gallery table
 		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'gallery (
@@ -66,6 +85,10 @@ class GalleryApp {
 		return true;
 	}
 
+	/**
+	 * application uninstall
+	 * @return boolean
+	 */
 	public function uninstall() {
 		// delete uploaded files
 		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'gallery');

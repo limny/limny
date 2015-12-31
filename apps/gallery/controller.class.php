@@ -1,17 +1,42 @@
 <?php
 
+/**
+ * Gallery controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2015 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class GalleryController {
+	// page query parameter
 	public $q;
+
+	// page cache setting
 	public $cache;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	/**
+	 * set database connection for gallery model
+	 * @param [type] $registry [description]
+	 */
 	public function GalleryController($registry) {
 		GalleryModel::$db = $registry->db;
 	}
 
+	/**
+	 * gallery page detector
+	 * detects proper page by given query parameter
+	 * @return boolean
+	 */
 	public function __global() {
 		$this->head = load_css('gallery', 'style.css');
 
@@ -27,6 +52,10 @@ class GalleryController {
 		return false;
 	}
 
+	/**
+	 * gallery default page
+	 * @return boolean
+	 */
 	private function __default() {
 
 		if ($cats = GalleryModel::cats()) {
@@ -49,6 +78,11 @@ class GalleryController {
 		return true;
 	}
 
+	/**
+	 * gallery category page
+	 * @param  integer $cat_id category id
+	 * @return boolean
+	 */
 	private function cat($cat_id) {
 		$cat = GalleryModel::cat($cat_id);
 
@@ -103,6 +137,11 @@ class GalleryController {
 		return true;
 	}
 
+	/**
+	 * gallery picture page
+	 * @param  integer $picture_id picture id
+	 * @return boolean
+	 */
 	private function picture($picture_id) {
 		if ($picture = GalleryModel::picture($picture_id)) {
 			$cat = GalleryModel::cat($picture['category']);
@@ -124,6 +163,11 @@ class GalleryController {
 		return false;
 	}
 
+	/**
+	 * get parent cat for navigation
+	 * @param  integer $cat_id category id
+	 * @return array
+	 */
 	private function parent_cats($cat_id) {
 		if (empty($cat_id))
 			return false;

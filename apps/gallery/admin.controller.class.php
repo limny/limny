@@ -1,20 +1,45 @@
 <?php
 
+/**
+ * Gallery administration controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class GalleryAdminController extends Manage {
+	// page query parameter
 	public $q;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	// upload directory
 	public $manage_upload_path = PATH . DS . 'uploads';
 
+	/**
+	 * call parent constructor
+	 * set manage page query parameter
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function __construct($registry) {
 		parent::__construct($registry);
 
 		$this->manage_q = $this->q;
 	}
 
+	/**
+	 * pictures page
+	 * @return void
+	 */
 	public function pics() {
 		$this->manage_title = GALLERY_PICTURES;
 		$this->manage_table = 'gallery';
@@ -56,6 +81,10 @@ class GalleryAdminController extends Manage {
 		$this->content = $this->manage();
 	}
 
+	/**
+	 * categories page
+	 * @return void
+	 */
 	public function cats() {
 		$this->manage_title = GALLERY_CATEGORIES;
 		$this->manage_table = 'gallery_cats';
@@ -84,6 +113,10 @@ class GalleryAdminController extends Manage {
 		$this->content = $this->manage();
 	}
 
+	/**
+	 * list of categories
+	 * @return array
+	 */
 	protected function cat_items() {
 		$items[0] = '[' . GALLERY_NO_PARENT . ']';
 
@@ -114,6 +147,11 @@ class GalleryAdminController extends Manage {
 		return $items;
 	}
 
+	/**
+	 * get name of parent category
+	 * @param  integer $cat_id category id
+	 * @return string
+	 */
 	protected function category_parent($cat_id) {
 		if (empty($cat_id))
 			return '<em class="text-gray">' . GALLERY_NO_PARENT . '</em>';
@@ -123,6 +161,15 @@ class GalleryAdminController extends Manage {
 		return $cat['name'];
 	}
 
+	/**
+	 * create picture thumbnail
+	 * @param  string  $function current function name (add/edit)
+	 * @param  array   $post     post data array
+	 * @param  array   $files    files data array
+	 * @param  integer $id       record id
+	 * @param  array   $item     original values of record as array
+	 * @return boolean
+	 */
 	public function generate_thumbnail($function, $post, $files, $id, $item = []) {
 		if (isset($item) && count($item) > 0) {
 			if (isset($files['image']) && empty($files['image']['name']))
@@ -172,12 +219,25 @@ class GalleryAdminController extends Manage {
 		return false;
 	}
 
+	/**
+	 * get picture category name
+	 * @param  integer $cat_id category id
+	 * @return string
+	 */
 	protected function picture_category($cat_id) {
 		$cat = GalleryAdminModel::cat($cat_id);
 
 		return $cat['name'];
 	}
 
+	/**
+	 * check image is sent
+	 * @param  string         $column image column name
+	 * @param  array          $post   post data array
+	 * @param  array          $files  files data array
+	 * @param  integer        $id     record id
+	 * @return boolean/string         string on error occurrence
+	 */
 	protected function image_check($column, $post, $files, $id = null) {
 		if (isset($id) && $id > 0)
 			return true;
@@ -188,6 +248,11 @@ class GalleryAdminController extends Manage {
 		return GALLERY_SENTENCE_1;
 	}
 
+	/**
+	 * delete picture(s) by given ID(s)
+	 * @param  array   $ids array of IDs
+	 * @return boolean
+	 */
 	protected function picture_delete($ids) {
 		foreach ($ids as $id)
 			if ($item = $this->get_item($id))
@@ -197,6 +262,11 @@ class GalleryAdminController extends Manage {
 		return true;
 	}
 
+	/**
+	 * delete category by given ID
+	 * @param  array   $ids array of IDs
+	 * @return boolean
+	 */
 	protected function category_delete($ids) {
 		$parent_ids = $ids;
 

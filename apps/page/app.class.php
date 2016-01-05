@@ -1,10 +1,27 @@
 <?php
 
+/**
+ * Page application
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class PageApp {
+	// database connection
 	private $db;
 
+	// setup library
 	private $setup;
 
+	/**
+	 * set database connection property
+	 * load setup library
+	 * set setup library property
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function __construct($registry) {
 		$this->db = $registry->db;
 
@@ -13,6 +30,10 @@ class PageApp {
 		$this->setup = $setup;
 	}
 
+	/**
+	 * page install
+	 * @return boolean
+	 */
 	public function install() {
 		// create pages table
 		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'pages (
@@ -48,6 +69,10 @@ class PageApp {
 		return true;
 	}
 
+	/**
+	 * page uninstall
+	 * @return boolean
+	 */
 	public function uninstall() {
 		// delete uploaded files
 		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'pages');

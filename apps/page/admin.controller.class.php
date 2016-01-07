@@ -1,12 +1,32 @@
 <?php
 
+/**
+ * Page administration controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class PageAdminController extends Manage {
+	// page query parameter
 	public $q;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	/**
+	 * call manage parent constructor
+	 * set page model connection
+	 * set query parameter to manage
+	 * @param object $registry
+	 */
 	public function __construct($registry) {
 		parent::__construct($registry);
 
@@ -15,6 +35,10 @@ class PageAdminController extends Manage {
 		$this->manage_q = $this->q;
 	}
 
+	/**
+	 * pages list
+	 * @return void
+	 */
 	public function __global() {
 		$this->manage_title = PAGE_PAGES;
 		$this->manage_table = 'pages';
@@ -85,6 +109,11 @@ $(function(){
 		$this->content = $this->manage();
 	}
 
+	/**
+	 * insert page permanent link
+	 * @param  string $title page title
+	 * @return string
+	 */
 	protected function page_permalink_add($title) {
 		$permalink = load_lib('permalink');
 		
@@ -96,6 +125,14 @@ $(function(){
 		return $title;
 	}
 
+	/**
+	 * update page permanent link
+	 * @param  string  $title page title
+	 * @param  array   $item  page item array
+	 * @param  array   $files posted files
+	 * @param  integer $id    record ID
+	 * @return string
+	 */
 	protected function page_permalink_edit($title, $item = [], $files = [], $id) {
 		$permalink = load_lib('permalink');
 
@@ -107,10 +144,21 @@ $(function(){
 		return $title;
 	}
 
+	/**
+	 * replace image URL in text
+	 * @param  string $text page content
+	 * @param  array  $page page item array
+	 * @return string
+	 */
 	protected function page_text($text, $page) {
 		return str_replace('{IMAGE}', $this->manage_upload_base . '/' . $page['image'], $text);
 	}
 
+	/**
+	 * delete page by given ID(s)
+	 * @param  array   $ids array of ID(s)
+	 * @return boolean
+	 */
 	protected function page_delete($ids) {
 		$permalink = load_lib('permalink');
 
@@ -126,6 +174,12 @@ $(function(){
 		return true;
 	}
 
+	/**
+	 * add link to page title
+	 * @param  string $title page title
+	 * @param  array  $item  page item array
+	 * @return string
+	 */
 	protected function page_title($title, $item) {
 		$permalink = load_lib('permalink');
 

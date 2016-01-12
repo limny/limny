@@ -22,7 +22,7 @@ class PostApp {
 	 * @param object $registry
 	 */
 	public function __construct($registry) {
-		$this->db = $registry;
+		$this->db = $registry->db;
 
 		$setup = load_lib('setup', true, true);
 

@@ -1,10 +1,26 @@
 <?php
 
+/**
+ * Post application
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class PostApp {
+	// database connection
 	private $db;
 
+	// setup library object
 	private $setup;
 
+	/**
+	 * set database connection
+	 * load setup library
+	 * set setup object
+	 * @param [type] $registry [description]
+	 */
 	public function __construct($registry) {
 		$this->db = $registry;
 
@@ -13,6 +29,12 @@ class PostApp {
 		$this->setup = $setup;
 	}
 
+	/**
+	 * create posts table
+	 * create categories table
+	 * insert navigation items and permissions
+	 * @return [type] [description]
+	 */
 	public function install() {
 		// create posts table
 		$this->db->exec('CREATE TABLE ' . DB_PRFX . 'posts (
@@ -71,6 +93,11 @@ class PostApp {
 		return true;
 	}
 
+	/**
+	 * delete image files
+	 * delete posts, categories and permanent links
+	 * @return [type] [description]
+	 */
 	public function uninstall() {
 		// delete uploaded files
 		$result = $this->db->query('SELECT image FROM ' . DB_PRFX . 'posts');

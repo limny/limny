@@ -19,7 +19,7 @@ class PostApp {
 	 * set database connection
 	 * load setup library
 	 * set setup object
-	 * @param [type] $registry [description]
+	 * @param object $registry
 	 */
 	public function __construct($registry) {
 		$this->db = $registry;
@@ -33,7 +33,7 @@ class PostApp {
 	 * create posts table
 	 * create categories table
 	 * insert navigation items and permissions
-	 * @return [type] [description]
+	 * @return boolean
 	 */
 	public function install() {
 		// create posts table
@@ -96,7 +96,7 @@ class PostApp {
 	/**
 	 * delete image files
 	 * delete posts, categories and permanent links
-	 * @return [type] [description]
+	 * @return boolean
 	 */
 	public function uninstall() {
 		// delete uploaded files

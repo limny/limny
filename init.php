@@ -11,7 +11,7 @@ session_start();
 // define running directory path, OS directory separator and base path for URLs
 define('PATH', __DIR__);
 define('DS', DIRECTORY_SEPARATOR);
-define('BASE', substr(PATH, strlen($_SERVER['DOCUMENT_ROOT'])));
+define('BASE', substr(str_replace('\\', '/', PATH), strlen($_SERVER['DOCUMENT_ROOT'])));
 
 // include database connection information
 require_once PATH . DS . 'config.php';

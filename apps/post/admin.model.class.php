@@ -22,7 +22,7 @@ class PostAdminModel {
 		if ($post = $result->fetch(PDO::FETCH_ASSOC))
 			return $post['id'];
 		
-		return '0';
+		return 0;
 	}
 
 	/**

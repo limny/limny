@@ -1,16 +1,42 @@
 <?php
 
+/**
+ * Post controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class PostController {
+	// page query parameter
 	public $q;
+
+	// page cache time
 	public $cache;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	// system registry object
 	private $registry;
+
+	// application library
 	private $application;
 
+	/**
+	 * set database connection for model
+	 * load application library
+	 * add feed tag to head if feed application is installed and enabled
+	 * @param  object $registry
+	 * @return void
+	 */
 	public function PostController($registry) {
 		$this->registry = $registry;
 		
@@ -25,6 +51,10 @@ class PostController {
 		}
 	}
 
+	/**
+	 * render page based on page query parameter
+	 * @return boolean
+	 */
 	public function __global() {
 		if (count($this->q['param']) < 2 || (count($this->q['param']) === 3 && $this->q['param'][1] == 'page' && is_numeric($this->q['param'][2])))
 			return $this->__default();
@@ -40,6 +70,10 @@ class PostController {
 		return false;
 	}
 
+	/**
+	 * main page for posts
+	 * @return boolean
+	 */
 	private function __default() {
 		$num_posts = PostModel::num_posts();
 
@@ -71,6 +105,11 @@ class PostController {
 			return $this->no_post();
 	}
 
+	/**
+	 * show single post by id
+	 * @param  integer $id post id
+	 * @return boolean
+	 */
 	private function post($id) {
 		if ($post = PostModel::post($id)) {
 			$post['text'] = $this->post_text($post['text'], $post['image']);
@@ -95,6 +134,11 @@ class PostController {
 		}
 	}
 
+	/**
+	 * show posts by category
+	 * @param  integer $cat_id category id
+	 * @return boolean
+	 */
 	private function cat($cat_id) {
 		$cat_item = PostModel::cat_by_id($cat_id);
 
@@ -131,6 +175,11 @@ class PostController {
 			return $this->no_post();
 	}
 
+	/**
+	 * show posts by tag
+	 * @param  string $tag tag name
+	 * @return boolean
+	 */
 	private function tag($tag) {
 		$tag = str_replace('-', ' ', $tag);
 
@@ -164,6 +213,12 @@ class PostController {
 			return $this->no_post();
 	}
 
+	/**
+	 * replace image address in post text
+	 * @param  string $text
+	 * @param  string $image
+	 * @return string
+	 */
 	private function post_text($text, $image) {
 		if (strpos($text, '{IMAGE}') === false)
 			return $text;
@@ -173,11 +228,20 @@ class PostController {
 		return str_replace('{IMAGE}', $image, $text);
 	}
 
+	/**
+	 * set title and content for pages with no post
+	 * @return void
+	 */
 	private function no_post() {
 		$this->title = ERROR;
 		$this->content = POST_SENTENCE_3;
 	}
 
+	/**
+	 * list of category names by given comma separated ids
+	 * @param  string         $category category ids
+	 * @return string/boolean
+	 */
 	private function post_category($category) {
 		if (empty($category) === false) {
 			foreach (explode(',', $category) as $cat_id) {
@@ -191,6 +255,11 @@ class PostController {
 		return false;
 	}
 
+	/**
+	 * list of tag names by given comma separated strings
+	 * @param  string         $tags
+	 * @return string/boolean
+	 */
 	private function post_tags($tags) {
 		if (empty($tags) === false) {
 			foreach (explode(',', $tags) as $tag) {
@@ -204,6 +273,11 @@ class PostController {
 		return false;
 	}
 
+	/**
+	 * post address if permanent link exists
+	 * @param  integer $post_id
+	 * @return string
+	 */
 	private function post_permalink($post_id) {
 		$permalink = load_lib('permalink');
 
@@ -215,6 +289,11 @@ class PostController {
 		return $post['url'];
 	}
 
+	/**
+	 * show post by author (user)
+	 * @param  integer $user_id
+	 * @return boolean
+	 */
 	private function author($user_id) {
 		$num_posts = PostModel::num_posts(null, null, $user_id);
 

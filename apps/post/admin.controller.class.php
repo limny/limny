@@ -186,14 +186,9 @@ $(function(){
 	 * @return string/boolean
 	 */
 	protected function post_category($cat_ids) {
-		foreach (explode(',', $cat_ids) as $cat_id) {
-			//$result = $db->prepare('SELECT name FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
-			//$result->execute([$cat_id]);
-
-			//if ($category = $result->fetch(PDO::FETCH_ASSOC))
+		foreach (explode(',', $cat_ids) as $cat_id)
 			if ($category = PostAdminModel::category($cat_id))
 				$names[] = $category['name'];
-		}
 
 		return isset($names) ? implode(', ', $names) : false;
 	}

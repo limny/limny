@@ -195,7 +195,7 @@ $(function(){
 
 	/**
 	 * generate post tags
-	 * remove spaces
+	 * remove spaces and duplicate tags
 	 * @param  string $tags comma separated
 	 * @return string
 	 */
@@ -206,6 +206,7 @@ $(function(){
 		$tags = explode(',', $tags);
 		$tags = array_map('trim', $tags);
 		$tags = array_filter($tags);
+		$tags = array_unique($tags);
 		$tags = implode(',', $tags);
 
 		return $tags;

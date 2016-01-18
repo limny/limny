@@ -1,12 +1,32 @@
 <?php
 
+/**
+ * Post administration controller
+ *
+ * @package Limny
+ * @author Hamid Samak <hamid@limny.org>
+ * @copyright 2009-2016 Limny
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class PostAdminController extends Manage {
+	// page query parameter
 	public $q;
 	
+	// page head tags
 	public $head;
+
+	// page title
 	public $title;
+
+	// page content
 	public $content;
 
+	/**
+	 * call manage constructor
+	 * set post model database connection
+	 * set manage page query parameter
+	 * @param [type] $registry [description]
+	 */
 	public function __construct($registry) {
 		parent::__construct($registry);
 
@@ -15,6 +35,10 @@ class PostAdminController extends Manage {
 		$this->manage_q = $this->q;
 	}
 
+	/**
+	 * posts list
+	 * @return void
+	 */
 	public function posts() {
 		$this->manage_title = POST_POSTS;
 		$this->manage_table = 'posts';
@@ -113,6 +137,10 @@ $(function(){
 		$this->content = $this->manage();
 	}
 
+	/**
+	 * categories list
+	 * @return void
+	 */
 	public function cats() {
 		$this->manage_title = POST_CATEGORIES;
 		$this->manage_table = 'posts_cats';
@@ -130,6 +158,11 @@ $(function(){
 		$this->content = $this->manage();
 	}
 
+	/**
+	 * post status in coloured text
+	 * @param  integer $status
+	 * @return string
+	 */
 	protected function post_status($status) {
 		if (empty($status))
 			return '<span class="text-red">' . POST_DRAFT . '</span>';
@@ -137,10 +170,21 @@ $(function(){
 		return '<span class="text-green">' . POST_PUBLISHED . '</span>';
 	}
 
+	/**
+	 * replace image address in text
+	 * @param  string $text
+	 * @param  array  $post post item array
+	 * @return string
+	 */
 	protected function post_text($text, $post) {
 		return str_replace('{IMAGE}', $this->manage_upload_base . '/' . $post['image'], $text);
 	}
 
+	/**
+	 * get post category names
+	 * @param  string         $cat_ids comma separated ids
+	 * @return string/boolean
+	 */
 	protected function post_category($cat_ids) {
 		foreach (explode(',', $cat_ids) as $cat_id) {
 			//$result = $db->prepare('SELECT name FROM ' . DB_PRFX . 'posts_cats WHERE id = ?');
@@ -154,6 +198,12 @@ $(function(){
 		return isset($names) ? implode(', ', $names) : false;
 	}
 
+	/**
+	 * generate post tags
+	 * remove spaces
+	 * @param  string $tags comma separated
+	 * @return string
+	 */
 	protected function post_tags($tags) {
 		if (empty($tags))
 			return false;
@@ -166,6 +216,11 @@ $(function(){
 		return $tags;
 	}
 
+	/**
+	 * insert permanent link by title
+	 * @param  string $title post title
+	 * @return string
+	 */
 	protected function post_permalink_add($title) {
 		$permalink = load_lib('permalink');
 		
@@ -177,6 +232,14 @@ $(function(){
 		return $title;
 	}
 
+	/**
+	 * update post permanent link
+	 * @param  string $title post title
+	 * @param  array  $item  posted data
+	 * @param  array  $files posted files
+	 * @param  integer $id    post id
+	 * @return string
+	 */
 	protected function post_permalink_edit($title, $item = [], $files = [], $id) {
 		$permalink = load_lib('permalink');
 
@@ -188,6 +251,11 @@ $(function(){
 		return $title;
 	}
 
+	/**
+	 * delete post image and permanent link
+	 * @param  array $ids array of posts ids
+	 * @return boolean
+	 */
 	protected function post_delete($ids) {
 		$permalink = load_lib('permalink');
 
@@ -203,6 +271,12 @@ $(function(){
 		return true;
 	}
 
+	/**
+	 * post title with navigation icon and url
+	 * @param  string $title post title
+	 * @param  array  $item  post item array
+	 * @return string
+	 */
 	protected function post_title($title, $item) {
 		return $title . ' <a href="' . url('post/' . $item['id']) . '" target="_blank"><i class="fa fa-location-arrow"></i></a>';
 	}

@@ -282,6 +282,9 @@ class CoreController {
 
 				$load_app = $this->load_app($this->q['param'][0], $method_name, $cache_file);
 
+				if (count($this->registry->q['param']) < 1)
+					$this->view->title = $this->registry->config->title;
+
 				if ($load_app === false)
 					$this->error_message(ERROR, SENTENCE_3);
 			}

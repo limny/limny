@@ -104,6 +104,7 @@ def('YES', 'Yes');
 def('NO', 'No');
 def('SMTP_USERNAME', 'SMTP Username');
 def('SMTP_PASSWORD', 'SMTP Password');
+def('SECURITY_CODE', 'Security code');
 
 def('SENTENCE_1', 'Please enter your username');
 def('SENTENCE_2', 'Please enter your password');
@@ -141,5 +142,6 @@ def('SENTENCE_33', 'Application page not found.');
 def('SENTENCE_34', 'There is no notification.');
 def('SENTENCE_35', 'This option is disabled by security');
 def('SENTENCE_36', 'Write app name or page inside [] for link to internal pages.');
+def('SENTENCE_37', 'The entry security code is incorrect.');
 
 ?>

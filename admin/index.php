@@ -5,7 +5,7 @@
  *
  * @package Limny
  * @author Hamid Samak <hamid@limny.org>
- * @copyright 2009-2015 Limny
+ * @copyright 2009-2016 Limny
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ $admin->load_language();
 if (admin_signed_in() !== true) {
 	$admin->is_remembered();
 
-	if ($admin->q[0] !== 'signin')
+	if (in_array($admin->q[0], ['signin', 'secimage']) === false)
 		redirect(BASE . '/' . ADMIN_DIR . '/signin');
 }
 

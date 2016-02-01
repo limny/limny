@@ -34,6 +34,8 @@
 			<?php } ?>
 			<input name="limny_username" type="text" class="form-control" placeholder="<?=USERNAME; ?>" value="<?php if (isset($_POST['limny_username'])) echo htmlentities($_POST['limny_username']); ?>" required autofocus>
 			<input name="limny_password" type="password" class="form-control" placeholder="<?=PASSWORD?>" required>
+			<p class="text-center"><img src="<?=BASE?>/<?=ADMIN_DIR?>/secimage" alt="Security code"></p>
+			<input name="limny_seccode" type="text" class="form-control" placeholder="<?=SECURITY_CODE?>" value="" required autocomplete="off">
 			<label class="checkbox">
 				<input name="limny_remember" type="checkbox" value="1"> <?=REMEMBER_ME?>
 			</label>
@@ -41,7 +43,6 @@
 		</form>
 
 	</div>
-
 
 	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<script src="misc/js/ie10-viewport-bug-workaround.js"></script>

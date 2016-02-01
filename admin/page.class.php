@@ -5,7 +5,7 @@
  *
  * @package Limny
  * @author Hamid Samak <hamid@limny.org>
- * @copyright 2009-2015 Limny
+ * @copyright 2009-2016 Limny
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Page {
@@ -26,15 +26,18 @@ class Page {
 	 * @return void
 	 */
 	public function page_signin() {
-		if (isset($_POST['limny_username']) && isset($_POST['limny_password'])) {
+		if (isset($_POST['limny_username']) && isset($_POST['limny_password']) && isset($_POST['limny_seccode'])) {
 			$username = $_POST['limny_username'];
 			$password = $_POST['limny_password'];
+			$seccode = $_POST['limny_seccode'];
 			$remember = isset($_POST['limny_remember']) ? true : false;
 			
 			if (empty($username))
 				$this->message = SENTENCE_1;
 			else if (empty($password))
 				$this->message = SENTENCE_2;
+			else if (empty($seccode) || isset($_SESSION['limny']['security_code']) === false || $seccode != $_SESSION['limny']['security_code'])
+				$this->message = SENTENCE_37;
 			else {
 				$result = $this->db->prepare('SELECT * FROM ' . DB_PRFX . 'users WHERE username = ?');
 				$result->execute([$username]);
@@ -97,6 +100,19 @@ class Page {
 
 			redirect(BASE . '/' . ADMIN_DIR);
 		}
+	}
+
+	/**
+	 * security image
+	 * @return void
+	 */
+	public function page_secimage() {
+		$security_code = load_lib('securitycode');
+
+		$_SESSION['limny']['security_code'] = $security_code->code;
+		$security_code->create();
+
+		exit;
 	}
 }
 

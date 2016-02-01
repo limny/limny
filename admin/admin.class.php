@@ -5,7 +5,7 @@
  *
  * @package Limny
  * @author Hamid Samak <hamid@limny.org>
- * @copyright 2009-2015 Limny
+ * @copyright 2009-2016 Limny
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Admin {
@@ -19,7 +19,8 @@ class Admin {
 	public $pages_in_method = [
 		'signin',
 		'signout',
-		'forgotpassword'
+		'forgotpassword',
+		'secimage'
 	];
 
 	// pages inside pages directory

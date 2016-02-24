@@ -456,8 +456,6 @@ function user_signed_in() {
 function language() {
 	global $registry;
 
-	//$q = query();
-
 	if (isset($registry->q['lang']))
 		return $registry->q['lang'];
 	

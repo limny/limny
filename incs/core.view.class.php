@@ -93,6 +93,8 @@ class CoreView {
 		$registry = $this->registry;
 		
 		if ($widgets = $this->widget_lib->widgets($widgets_position)) {
+			ob_start();
+
 			foreach ($widgets as $widget_item) {
 				$widget = (object) [];
 
@@ -186,9 +188,12 @@ class CoreView {
 
 				include $this->theme_path . 'widget.tpl';
 			}
+
+			$contents = ob_get_contents();
+			ob_end_clean();
 		}
 		
-		return false;
+		return isset($contents) && empty($contents) === false ? $contents : false;
 	}
 	
 	/**

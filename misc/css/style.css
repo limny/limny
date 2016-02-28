@@ -28,3 +28,12 @@
 .limny.user-signin-block ul > li {
 	list-style-type: none;
 }
+
+.limny.user-signin-block label {
+	display: inline-block;
+}
+
+.limny.user-signin-block .form-control {
+	width: 100%;
+	display: block;
+}

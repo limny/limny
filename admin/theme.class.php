@@ -55,10 +55,8 @@ class Theme {
 	 * @return array/boolean
 	 */
 	public function theme_files($theme_name, $path = null) {
-		$theme_path = $this->themes_path . DS . $theme_name;
-
 		if (empty($path))
-			$path = $theme_path;
+			$path = $this->themes_path . DS . $theme_name;
 
 		foreach (scandir($path) as $file)
 			if (in_array($file, ['.', '..']) === false && in_array(strtolower(substr($file, strrpos($file, '.') + 1)), ['php', 'tpl', 'htm', 'html', 'css', 'js']))

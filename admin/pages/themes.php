@@ -79,9 +79,9 @@ switch ($admin->q[1]) {
 			$theme_name = $admin->q[2];
 
 			$files = [];
-			$file_name = isset($admin->q[3]) ? $admin->q[3] : false;
+			$file_name = isset($admin->q[3]) ? implode('/', array_slice($admin->q, 3)) : false;
 
-			if ($theme_files = $theme->theme_files($theme_name)) {
+			if ($theme_files = $theme->theme_files($theme_name, null, true)) {
 				if (count($theme_files) < 1)
 					redirect(BASE . '/' . ADMIN_DIR . '/themes');
 				else if ($file_name === false)

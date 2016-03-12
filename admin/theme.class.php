@@ -54,15 +54,20 @@ class Theme {
 	 * @param  string        $path
 	 * @return array/boolean
 	 */
-	public function theme_files($theme_name, $path = null) {
+	public function theme_files($theme_name, $path = null, $recursive = false) {
 		if (empty($path))
 			$path = $this->themes_path . DS . $theme_name;
 
-		foreach (scandir($path) as $file)
-			if (in_array($file, ['.', '..']) === false && in_array(strtolower(substr($file, strrpos($file, '.') + 1)), ['php', 'tpl', 'htm', 'html', 'css', 'js']))
-				$files[] = $file;
+		$files = [];
 
-		if (isset($files)) {
+		foreach (scandir($path) as $file)
+			if (in_array($file, ['.', '..']) === false)
+				if ($recursive === true && is_dir($path . DS . $file))
+					$files = array_merge($files, $this->theme_files($theme_name, $path . DS . $file, true));
+				else if (in_array(strtolower(substr($file, strrpos($file, '.') + 1)), ['php', 'tpl', 'htm', 'html', 'css', 'js']))
+					$files[] = $recursive === true ? substr($path . DS . $file, strlen($this->themes_path . DS . $theme_name) + 1) : $file;
+
+		if (count($files) > 0) {
 			asort($files);
 
 			return $files;

@@ -92,8 +92,7 @@ class Solar {
 		for ($i = 1; $i < 13; $i++) {
 			if ($s_month > $i)
 				$modulus += $this->s_months[$i];
-			else
-			{
+			else {
 				$modulus += $s_day;
 				break;
 			}

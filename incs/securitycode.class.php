@@ -30,7 +30,7 @@ class SecurityCode {
 	private $default_font_path = PATH . DS . 'misc' . DS . 'font';
 
 	public function __construct() {
-		$this->load_code();
+		$this->generate();
 	}
 
 	private function load_font() {
@@ -52,7 +52,7 @@ class SecurityCode {
 		return false;
 	}
 
-	private function load_code() {
+	private function generate() {
 		$this->code = '';
 		$chars = str_split($this->characters);
 

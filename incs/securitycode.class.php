@@ -34,7 +34,9 @@ class SecurityCode {
 	}
 
 	private function load_font() {
-		if (empty($this->font_path) && file_exists($this->default_font_path) && is_dir($this->default_font_path)) {
+		if (empty($this->font_path) === false)
+			return true;
+		else if (file_exists($this->default_font_path) && is_dir($this->default_font_path)) {
 			foreach (scandir($this->default_font_path) as $dir)
 				if (in_array($dir, ['.', '..']) === false && is_dir($this->default_font_path . DS . $dir))
 					foreach (scandir($this->default_font_path . DS . $dir) as $file)

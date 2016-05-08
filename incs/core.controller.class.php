@@ -132,7 +132,7 @@ class CoreController {
 	private function error_message($title, $content) {
 		header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
 		
-		$this->view->title = $title;
+		$this->view->title = $title . ' - ' . $this->registry->config->title;
 		$this->view->content = $content;
 	}
 

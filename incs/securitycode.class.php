@@ -27,9 +27,11 @@ class SecurityCode {
 	public $position = [5, 5];
 
 	private $image;
-	private $default_font_path = PATH . DS . 'misc' . DS . 'font';
+	private $default_font_path;
 
 	public function __construct() {
+		$this->default_font_path = PATH . DS . 'misc' . DS . 'font';
+
 		$this->generate();
 	}
 

@@ -22,7 +22,7 @@ class GalleryAdminController extends Manage {
 	public $content;
 
 	// upload directory
-	public $manage_upload_path = PATH . DS . 'uploads';
+	public $manage_upload_path;
 
 	/**
 	 * call parent constructor
@@ -34,6 +34,7 @@ class GalleryAdminController extends Manage {
 		parent::__construct($registry);
 
 		$this->manage_q = $this->q;
+		$this->manage_upload_path = PATH . DS . 'uploads';
 	}
 
 	/**

@@ -73,6 +73,7 @@ class GalleryAdminController extends Manage {
 		];
 
 		$this->manage_action->add_value->time = time();
+		$this->manage_action->list->title = 'pic_title';
 		$this->manage_action->list->category = 'picture_category';
 		$this->manage_action->add->function = 'generate_thumbnail';
 		$this->manage_action->edit->function = 'generate_thumbnail';
@@ -109,6 +110,7 @@ class GalleryAdminController extends Manage {
 			]
 		];
 
+		$this->manage_action->list->name = 'cat_name';
 		$this->manage_action->list->parent = 'category_parent';
 		$this->manage_action->delete = 'category_delete';
 
@@ -289,6 +291,26 @@ class GalleryAdminController extends Manage {
 		}
 
 		return true;
+	}
+
+	/**
+	 * category name with navigation icon and url
+	 * @param  string $name post name
+	 * @param  array  $item  post item array
+	 * @return string
+	 */
+	protected function cat_name($name, $item) {
+		return $name . ' <a href="' . url('gallery/cat/' . $item['id']) . '" target="_blank"><i class="fa fa-location-arrow"></i></a>';
+	}
+
+	/**
+	 * picture title with navigation icon and url
+	 * @param  string $title post title
+	 * @param  array  $item  post item array
+	 * @return string
+	 */
+	protected function pic_title($title, $item) {
+		return $title . ' <a href="' . url('gallery/' . $item['id']) . '" target="_blank"><i class="fa fa-location-arrow"></i></a>';
 	}
 }
 

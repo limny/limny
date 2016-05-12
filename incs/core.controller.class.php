@@ -130,7 +130,7 @@ class CoreController {
 	 * @param  string $content
 	 */
 	private function error_message($title, $content) {
-		header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+		header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
 		
 		$this->view->title = $title . ' - ' . $this->registry->config->title;
 		$this->view->content = $content;
@@ -186,7 +186,7 @@ class CoreController {
 		foreach (['__global', $method_name, str_replace('-', '_', $method_name), '__404'] as $value)
 			if (method_exists($app_controller, $value) && is_callable([$app_controller, $value])) {
 				if ($value === '__404') {
-					header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+					header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
 					$is_404 = true;
 				}
 

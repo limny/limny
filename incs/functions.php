@@ -29,7 +29,7 @@ function def($name, $value, $case_insensitive = false) {
  * @return void
  */
 function redirect($url) {
-	header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+	header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently', true, 301);
 	header('Location: ' . $url);
 	exit;
 }

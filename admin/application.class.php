@@ -261,7 +261,7 @@ class Application extends Admin {
 			foreach (['__global', $app_method, '__404'] as $method_name)
 				if (method_exists($app_controller, $method_name) && is_callable([$app_controller, $method_name])) {
 					if ($method_name === '__404') {
-						header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+						header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404);
 						$is_404 = true;
 					}
 
